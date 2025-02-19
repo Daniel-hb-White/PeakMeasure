@@ -1,0 +1,63 @@
+<RootWidget>:
+
+    # Background Image - replace with camera
+    Image:
+        source: './images/kolosseum-rom.webp'
+        fit_mode: 'cover'
+
+    MDAnchorLayout: # AnchorLayout for screen positon
+        anchor_x: "center"
+        anchor_y: "top"
+        MDBoxLayout: # BoxLayout for size, etc.
+            orientation: "horizontal"
+            size_hint: None, None
+            size: dp(280), dp(100)
+            padding: 20
+            spacing: 10
+        
+            MDLabel:
+                md_bg_color: [0, 0, 0, 0.3]
+                padding: dp(4), dp(4)
+                halign: "center"
+                multiline: True
+                text: "Distanz:\n0m"
+
+            MDLabel:
+                md_bg_color: [0, 0, 0, 0.3]
+                padding: dp(4), dp(4)
+                halign: "center"
+                multiline: True
+                text: "Höhe:\nN/A"
+
+    MDAnchorLayout:
+        anchor_x: "center"
+        anchor_y: "center"
+        MDIcon:
+            icon: "plus"
+            icon_color: [1, 1, 1, 1]
+
+    MDAnchorLayout: # AnchorLayout for screen positon
+        anchor_x: "center"
+        anchor_y: "bottom"
+        MDRelativeLayout: # BoxLayout for size, etc.
+            orientation: "horizontal"
+            size_hint: None, None
+            size: dp(350), dp(100)
+            md_bg_color: [0, 0, 0, 0.3]
+
+            MDIconButton:
+                pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                size_hint: None, None
+                size: dp(60), dp(60)
+                style: "filled"
+                theme_bg_color: "Custom"
+                md_bg_color: [1, 1, 1, 1]
+
+            MDTextField:
+                pos_hint: {"center_x": 0.8, "center_y": 0.5}
+                mode: "outlined"
+                size_hint_x: None
+                width: dp(100)
+                md_bg_color: [1, 1, 1, 1]
+                MDTextFieldHintText:
+                    text: "Height"
