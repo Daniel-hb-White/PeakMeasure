@@ -2,6 +2,8 @@
 
 ## **App-Name**: PeakMeasure  
 
+![Mockup der App](mokup-peakmeasure-2.png)
+
 ## **App-Beschreibung**  
 PeakMeasure ist eine App zur Messung von Höhen und Entfernungen mithilfe der Kamera und des Neigungssensors eines mobilen Geräts. Die App nutzt die Kamera-Vorschau als zentrales Element und zeigt über ein Overlay Messwerte an. Der Benutzer kann eine manuelle Anpassung des Bodenabstands vornehmen, indem er auf den entsprechenden Wert tippt und eine neue Zahl eingibt. Außerdem werden erfasste Höhen in einer JSON-Datei gespeichert.
 
@@ -44,3 +46,4 @@ Die App besteht aus einer einzigen Ansicht, die in folgende Bereiche unterteilt 
   - Die **Kamera-Vorschau** (`Camera`) wird als Hintergrund in einem `FloatLayout` dargestellt.  
   - Alle UI-Elemente (Messwerte, Fadenkreuz, Buttons) werden als Overlays innerhalb des `FloatLayout` positioniert.  
   - `AnchorLayout` oder `GridLayout` kann für die exakte Anordnung von UI-Elementen verwendet werden.  
+
