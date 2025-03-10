@@ -7,7 +7,6 @@ from kivy.graphics.texture import Texture
 from kivy.uix.relativelayout import RelativeLayout
 
 from kivymd.app import MDApp
-from kivymd.uix.menu import MDDropdownMenu
 
 
 class RootWidget(RelativeLayout):
@@ -30,13 +29,13 @@ class RootWidget(RelativeLayout):
         if self.capture.isOpened():
             self.capture.release()
 
-class PeakMeasureApp(MDApp):
+class Main(MDApp):
 
     # def on_start(self):
     #     self.fps_monitor_start()
 
     def build(self):
-        self.icon = './images/mokup_und_logo/PeakMeasureLogo.png'
+        self.icon = './mokup_und_logo/PeakMeasureLogo.png'
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "White"
 
@@ -49,4 +48,4 @@ class PeakMeasureApp(MDApp):
         self.root.on_stop()
 
 
-PeakMeasureApp().run()
+Main().run()
