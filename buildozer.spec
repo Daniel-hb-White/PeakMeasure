@@ -4,7 +4,7 @@ title = PeakMeasure
 package.name = peakmeasure
 package.domain = gsog.de
 
-source.dir = .src
+source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,mp3
 
 version = 0.1
