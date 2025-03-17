@@ -11,6 +11,8 @@ source.include_exts = py,png,jpg,kv,atlas,mp3
 version = 0.1
 requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/master.zip,materialyoucolor,exceptiongroup,asyncgui,asynckivy,opencv,numpy,plyer
 
+icon.filename = mokup_und_logo/PeakMeasureLogo.png
+
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a
