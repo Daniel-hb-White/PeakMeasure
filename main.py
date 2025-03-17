@@ -6,16 +6,27 @@ from kivy.utils import platform
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.relativelayout import RelativeLayout
-
 from kivymd.app import MDApp
+
+if platform == "android":
+    from android.permissions import request_permissions, Permission, check_permission
 
 
 class RootWidget(RelativeLayout):
     def __init__(self, **kw):
         super().__init__(**kw)
-        self.capture = cv2.VideoCapture(0)
+        self.camera_initialized = False
+        self.capture = None
         self.image_widget = self.ids.camera_image
-        Clock.schedule_interval(self.update_camera, 1 / 30)
+
+    def start_camera(self):
+        self.capture = cv2.VideoCapture(0)
+        if not self.capture.isOpened():
+            print("Error: Could not access the camera.")
+        else:
+            self.camera_initialized = True
+            Clock.schedule_interval(self.update_camera, 1 / 30)
+            print("Camera successfully started.")
 
     def update_camera(self, dt):
         ret, frame = self.capture.read()
@@ -27,7 +38,7 @@ class RootWidget(RelativeLayout):
             self.image_widget.texture = texture
 
     def on_stop(self):
-        if self.capture.isOpened():
+        if self.capture is not None and self.capture.isOpened():
             self.capture.release()
 
     def update_labe_distance_value(self, distance):
@@ -52,11 +63,17 @@ class Main(MDApp):
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
         if platform == "android":
-            from android.permissions import request_permissions, Permission
             request_permissions([Permission.CAMERA])
+            if check_permission(Permission.CAMERA):
+                print("Camera permission granted.")
+            else:
+                print("Camera permission not granted.")
 
         return RootWidget()
     
+    def on_start(self):
+        self.root.start_camera()
+
     def on_stop(self):
         self.root.on_stop()
 
