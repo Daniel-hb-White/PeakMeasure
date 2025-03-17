@@ -31,6 +31,15 @@ class RootWidget(RelativeLayout):
         if self.capture.isOpened():
             self.capture.release()
 
+    def update_labe_distance_value(self, distance):
+        self.ids.label_distance.text = f"Distanz:\n{distance}m"
+
+    def update_label_height_value(self, height):
+        self.ids.label_height.text = f"Höhe:\n{height}m"
+
+    def text_field_person_height_on_text(self, text):
+        print(f"Text entered: {text}")
+
 class Main(MDApp):
 
     # def on_start(self):
