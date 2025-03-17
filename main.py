@@ -100,8 +100,8 @@ class RootWidget(RelativeLayout):
 
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
-                distance = h * math.tan(self.pitch)
-                self.update_label_distance_value(distance)
+                self.distance = h * math.tan(self.pitch)
+                self.update_label_distance_value(self.distance)
                 self.step = 1
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
@@ -111,6 +111,7 @@ class RootWidget(RelativeLayout):
             else:
                 self.update_label_distance_value("")
                 self.update_label_height_value("")
+                self.step = 0
 
 
         except Exception as e:
