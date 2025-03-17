@@ -36,6 +36,7 @@ class RootWidget(RelativeLayout):
         self.camera_initialized = False
         self.capture = None
         self.image_widget = self.ids.camera_image
+        self.personHeight = None
 
     def start_camera(self):
         self.capture = cv2.VideoCapture(0)
@@ -67,6 +68,7 @@ class RootWidget(RelativeLayout):
 
     def text_field_person_height_on_text(self, text):
         print(f"Text entered: {text}")
+        self.personHeight = float(text)
 
     def enable_listener(self):
         """Enable the orientation listener and start updating orientation values."""
@@ -95,6 +97,9 @@ class RootWidget(RelativeLayout):
         """
         try:
             h = 1.5 # Approximate phone height from the ground in meters
+
+            if self.personHeight != None:
+                h = self.personHeight
 
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
