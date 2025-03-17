@@ -21,7 +21,6 @@ class RootWidget(RelativeLayout):
     
     # Orientation values in degrees
     pitch = NumericProperty(0)
-    pitchRounded = NumericProperty(0)
     azimuth = NumericProperty(0)
     roll = NumericProperty(0)
 
@@ -85,7 +84,6 @@ class RootWidget(RelativeLayout):
             azimuth, pitch, roll = spatialorientation.orientation
             self.azimuth = azimuth * (180/math.pi)
             self.pitch = pitch * (180/math.pi) * -1
-            self.pitchRounded = round(self.pitch, 2)
             self.roll = roll * (180/math.pi)
     
     def on_measure_button(self):
