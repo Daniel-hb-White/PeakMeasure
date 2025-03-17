@@ -16,26 +16,18 @@ class RootWidget(RelativeLayout):
     def __init__(self, **kw):
         super().__init__(**kw)
         self.camera_initialized = False
-        self.camera_retry_attempts = 0
         self.capture = None
         self.image_widget = self.ids.camera_image
 
     def start_camera(self):
-        if not self.camera_initialized:
-            self.camera_retry_attempts += 1
-            if self.camera_retry_attempts <= 10:
-                print(f"Attempt {self.camera_retry_attempts}: Trying to access the camera...")
-                self.capture = cv2.VideoCapture(0)
-
-                if self.capture.isOpened():
-                    self.camera_initialized = True
-                    print("Camera successfully started.")
-                    Clock.schedule_interval(self.update_camera, 1 / 30)
-                else:
-                    print("Error: Could not access the camera. Retrying...")
-                    Clock.schedule_once(self.start_camera(), 2)
-            else:
-                print("Failed to access the camera after several attempts.")
+        # Use OpenCV's native Android camera support (using the NDK)
+        self.capture = cv2.VideoCapture(0, cv2.CAP_ANDROID)
+        if not self.capture.isOpened():
+            print("Error: Could not access the camera.")
+        else:
+            self.camera_initialized = True
+            Clock.schedule_interval(self.update_camera, 1 / 30)
+            print("Camera successfully started.")
 
     def update_camera(self, dt):
         ret, frame = self.capture.read()
@@ -59,6 +51,7 @@ class RootWidget(RelativeLayout):
     def text_field_person_height_on_text(self, text):
         print(f"Text entered: {text}")
 
+
 class Main(MDApp):
 
     # def on_start(self):
@@ -79,7 +72,7 @@ class Main(MDApp):
                 print("Camera permission not granted.")
 
         return RootWidget()
-    
+
     def on_start(self):
         self.root.start_camera()
 
