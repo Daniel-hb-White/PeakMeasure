@@ -1,16 +1,16 @@
 <RootWidget>:
     Carousel:
         direction: "left"
-
+        
         MDFloatLayout:
             Image:
                 id: camera_image
                 fit_mode: 'cover'
 
-            MDAnchorLayout: # AnchorLayout for screen positon
+            MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
                 anchor_y: "top"
-                MDBoxLayout: # BoxLayout for size, etc.
+                MDBoxLayout:  # BoxLayout for size, etc.
                     orientation: "horizontal"
                     size_hint: None, None
                     size: dp(280), dp(100)
@@ -39,20 +39,41 @@
                     MDIcon:
                         icon: "plus"
                         icon_color: [1, 1, 1, 1]
-        MDRelativeLayout:
-            MDTextField:
-                pos_hint: {"center_x": .5, "center_y": .5}
-                mode: "outlined"
-                size_hint_x: None
-                width: dp(200)
-                md_bg_color: [1, 1, 1, 1]
-                on_text: root.text_field_person_height_on_text(self.text)
-                MDTextFieldHintText:
-                    text: "Größe"
-            MDLabel:
-                text: "Geben Sie Ihre Größe in Metern ein (z.B. 1.75)"
-                theme_text_color: "Secondary"
-                halign: "center"
-                size_hint_y: None
-                height: dp(40)
-                pos_hint: {"center_x": .5, "y": .2}
+
+        MDFloatLayout:
+            MDAnchorLayout:  # AnchorLayout for screen position
+                anchor_x: "center"
+                anchor_y: "top"
+                padding: dp(30), dp(30)
+                md_bg_color: "white"
+
+                MDBoxLayout:  # BoxLayout für die zweite Seite
+                    orientation: "vertical"
+                    md_bg_color: "white"
+                    size_hint: None, None
+                    size: dp(280), dp(400)
+
+                    MDTextField:
+                        text_color_normal: "black"
+                        line_color_normal: "black"
+                        size_hint_y: None
+                        height: dp(50)  # Höhe des Textfeldes
+                        mode: "outlined"  # Benutzt die Outline für das Textfeld
+                        width: dp(200)
+                        hint_text: ""  # Hinweistext im Textfeld
+                        text: "1.5"
+
+                        on_text: root.text_field_person_height_on_text(self.text)
+                        MDTextFieldHintText:
+                            text: "Höhe Ihres Gerätes in Metern"
+
+                    MDLabel:
+                        text: "[b]Anleitung:[/b]\n\n"
+                        markup: True
+                        color: "black"    
+
+                    MDLabel:
+                        text: "[b]1. Setze den niedrigsten Punkt:[/b] \nZielen Sie mit dem Fadenkreuz auf die Basis des Objekts und tippen Sie auf den Bildschirm. \n\n[b]2. Setze den höchsten Punkt:[/b] \nZielen Sie mit dem Fadenkreuz auf die Spitze des Objekts und tippen Sie erneut auf den Bildschirm. \n\n[b]3. Zurücksetzen:[/b] \nTippen Sie ein weiteres Mal auf den Bildschirm, um die Messung zurückzusetzen."
+                        color: "black"
+                        markup: True
+                        font_size: 10
