@@ -1,5 +1,4 @@
 import cv2
-from plyer import permission
 
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -53,7 +52,8 @@ class Main(MDApp):
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
         if platform == "android":
-            permission.request_permissions([permission.Permission.CAMERA])
+            from android.permissions import request_permissions, Permission
+            request_permissions([Permission.CAMERA])
 
         return RootWidget()
     
