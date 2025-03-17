@@ -11,6 +11,7 @@ from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.uix.relativelayout import RelativeLayout
 from kivymd.app import MDApp
+from plyer import spatialorientation
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission
@@ -36,6 +37,7 @@ class RootWidget(RelativeLayout):
         self.camera_initialized = False
         self.capture = None
         self.image_widget = self.ids.camera_image
+        self.facade = spatialorientation
 
     def start_camera(self):
         self.capture = cv2.VideoCapture(0)
@@ -92,6 +94,7 @@ class RootWidget(RelativeLayout):
         Handle button press to perform distance or height calculation in two steps.
         Step 0: Measure horizontal distance.
         Step 1: Measure vertical height using previously calculated distance.
+        Step 2: Reset distance and height value
         """
         try:
             h = 1.5 # Approximate phone height from the ground in meters
