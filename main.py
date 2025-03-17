@@ -37,7 +37,6 @@ class RootWidget(RelativeLayout):
         self.camera_initialized = False
         self.capture = None
         self.image_widget = self.ids.camera_image
-        self.facade = spatialorientation
 
     def start_camera(self):
         self.capture = cv2.VideoCapture(0)
@@ -72,18 +71,18 @@ class RootWidget(RelativeLayout):
 
     def enable_listener(self):
         """Enable the orientation listener and start updating orientation values."""
-        self.facade.enable_listener()
+        spatialorientation.enable_listener()
         Clock.schedule_interval(self.get_orientation, 1 / 20.)
 
     def disable_listener(self):
         """Disable the orientation listener and stop updating orientation values."""
-        self.facade.disable_listener()
+        spatialorientation.disable_listener()
         Clock.unschedule(self.get_orientation)
 
     def get_orientation(self, dt):
         """Update the orientation properties if valid data is available."""
-        if self.facade.orientation != (None, None, None):
-            azimuth, pitch, roll = self.facade.orientation
+        if spatialorientation.orientation != (None, None, None):
+            azimuth, pitch, roll = spatialorientation.orientation
             self.azimuth = azimuth * (180/math.pi)
             self.pitch = pitch * (180/math.pi) * -1
             self.pitchRounded = round(self.pitch, 2)
@@ -147,6 +146,5 @@ class Main(MDApp):
     def on_stop(self):
         self.root.on_stop()
         self.root.disable_listener()
-
 
 Main().run()
