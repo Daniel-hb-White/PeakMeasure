@@ -8,6 +8,19 @@ from kivy.uix.relativelayout import RelativeLayout
 
 from kivymd.app import MDApp
 
+from plyer import permission
+
+class RootWidget(RelativeLayout):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        
+        # Kamera-Berechtigung anfragen
+        if platform == "android":
+            permission.request_permissions([permission.Permission.CAMERA])
+
+        self.capture = cv2.VideoCapture(0)
+        self.image_widget = self.ids.camera_image
+        Clock.schedule_interval(self.update_camera, 1 / 30)
 
 class RootWidget(RelativeLayout):
     def __init__(self, **kw):
