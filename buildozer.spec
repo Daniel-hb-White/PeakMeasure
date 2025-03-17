@@ -1,5 +1,6 @@
 [app]
 
+android.permissions = CAMERA
 title = PeakMeasure
 package.name = peakmeasure
 package.domain = gsog.de
