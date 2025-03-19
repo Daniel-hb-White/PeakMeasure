@@ -3,8 +3,9 @@
         direction: "left"
         
         MDFloatLayout:
-            Image:
-                id: camera_image
+            Camera:
+                play: True
+                keep_ratio: True
                 fit_mode: 'cover'
 
             MDAnchorLayout:  # AnchorLayout for screen position
@@ -19,6 +20,7 @@
 
                     MDLabel:
                         id: label_distance
+                        color: "white"
                         md_bg_color: [0, 0, 0, 0.3]
                         padding: dp(4), dp(4)
                         halign: "center"
@@ -27,6 +29,7 @@
 
                     MDLabel:
                         id: label_height
+                        color: "white"
                         md_bg_color: [0, 0, 0, 0.3]
                         padding: dp(4), dp(4)
                         halign: "center"
