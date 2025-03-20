@@ -36,8 +36,8 @@
                     MDButton:
                         text: "Berechnen"
                         size_hint: None, None
-                        width: dp(10)
-                        height: dp(10)
+                        width: dp(100)
+                        height: dp(100)
                         on_press: root.on_measure_button()
 
 
@@ -65,7 +65,8 @@
                 height: dp(40)
                 pos_hint: {"center_x": .5, "y": .2}
             MDButton:
-                text: str(root.measureTypeButton)
-                width: dp(10)
-                height: dp(10)
+                width: dp(100)
+                height: dp(100)
                 on_press: root.switchCalculation()
+                MDButtonText:
+                    text: str(root.measureTypeButton)
