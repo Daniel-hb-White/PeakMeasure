@@ -16,20 +16,11 @@ from plyer import spatialorientation
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission
 
-
 class RootWidget(RelativeLayout):
-    
-    # Orientation values in degrees
-    pitch = NumericProperty(0)
-    azimuth = NumericProperty(0)
-    roll = NumericProperty(0)
-
     # Measurement values
-    distance = NumericProperty(0)
     distanceRounded = NumericProperty(0)
     heightRounded = NumericProperty(0)
     label = StringProperty("")
-    step = NumericProperty(0)    # Step tracker (0 = measuring distance, 1 = measuring height, 2 = reset values)
     measureTypeButton = StringProperty("Große Objekte")
 
     facade = ObjectProperty()
@@ -39,7 +30,8 @@ class RootWidget(RelativeLayout):
         self.camera_initialized = False
         self.capture = None
         self.image_widget = self.ids.camera_image
-        self.personHeight = None
+        self.orientationHandler = OrientationHandler()
+        self.measurementsHandler = MeasurementHandler()
 
     def start_camera(self):
         self.capture = cv2.VideoCapture(0)
@@ -62,10 +54,48 @@ class RootWidget(RelativeLayout):
     def on_stop(self):
         if self.capture is not None and self.capture.isOpened():
             self.capture.release()
-
+    
     def text_field_person_height_on_text(self, text):
-        print(f"Text entered: {text}")
-        self.personHeight = float(text)
+        """Set the person's height based on user input."""
+        try:
+            self.measurementsHandler.setPersonHeight(float(text))
+        except ValueError:
+            self.label = "Fehler: Ungültige Eingabe."
+    
+    def on_measure_button(self):
+        """
+        Handle button press to perform distance or height calculation in two steps.
+        Step 0: Measure horizontal distance.
+        Step 1: Measure vertical height using previously calculated distance.
+        Step 2: Reset distance and height value
+        """
+        try:
+            if self.step == 0:
+                # Step 1: Calculate distance using the pitch angle
+                distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.pitch)
+                self.step = 1
+
+            elif self.step == 1:
+                # Step 2: Calculate height using distance and new pitch angle
+                height, self.heightRounded = self.measurementsHandler.calculateHeight(distance, self.orientationHandler.pitch)
+                self.step = 2
+            else:
+                #Step 3: Reset values in UI
+                self.measurementsHandler.resetMeasurements()    
+
+        except Exception as e:
+            # Handle any unexpected errors during calculation
+            self.label = f"Fehler: {str(e)}"
+    
+    def switchMeasurementType(self):
+        self.measureTypeButton = self.measurementsHandler.switchMeasurementType()
+
+#---------------------------- OrientationHandler ---------------------------------
+class OrientationHandler:
+    def __init__(self):
+        self.pitch = 0
+        self.azimuth = 0
+        self.roll = 0
 
     def enable_listener(self):
         """Enable the orientation listener and start updating orientation values."""
@@ -90,45 +120,40 @@ class RootWidget(RelativeLayout):
                 self.pitch = 89
             self.pitchRounded = round(self.pitch, 2)
             self.roll = roll * (180/math.pi)
-    
-    def on_measure_button(self):
-        """
-        Handle button press to perform distance or height calculation in two steps.
-        Step 0: Measure horizontal distance.
-        Step 1: Measure vertical height using previously calculated distance.
-        Step 2: Reset distance and height value
-        """
-        try:
-            h = 1.5 # Approximate phone height from the ground in meters
 
-            if self.personHeight != None:
-                h = self.personHeight
+#----------------------------------------------------------------------------------
+#----------------------------- MeasurementHandler ---------------------------------
+class MeasurementHandler:
+    def __init__(self):
+        self.distance = 0
+        self.distanceRounded = 0
+        self.height = 0
+        self.heightRounded = 0
+        self.step = 0
+        self.personHeight = 1.5  # Default height in meters
+        self.measureTypeButton = "Große Objekte"
 
-            if self.step == 0:
-                # Step 1: Calculate distance using the pitch angle
-                self.distance = abs(h / math.tan(math.radians(self.pitch)))
-                self.distanceRounded = round(self.distance, 2)
-                self.step = 1
-            elif self.step == 1:
-                # Step 2: Calculate height using distance and new pitch angle
-                height = abs(self.distance * math.tan(math.radians(self.pitch)))
+    def setPersonHeight(self, height):
+        self.personHeight = height    
 
-                if self.measureTypeButton == "Große Objekte":
-                    height = height + h
-                else:
-                    height = h - height
+    def calculateDistance(self, pitch):
+        """Calculate horizontal distance based on the pitch angle."""
+        distance = abs(self.personHeight / math.tan(math.radians(pitch)))
+        return distance, round(distance, 2)
 
-                self.heightRounded = round(height, 2)
-                self.step = 2
-            else:
-                #Step 3: Reset values in UI
-                self.resetMeasurements()    
+    def calculateHeight(self, distance, pitch):
+        """Calculate vertical height based on the horizontal distance and pitch angle."""
+        height = abs(distance * math.tan(math.radians(pitch)))
+                
+        if self.measureTypeButton == "Große Objekte":
+            height = height + self.personHeight
+        else:
+            height = self.personHeight - height
 
-        except Exception as e:
-            # Handle any unexpected errors during calculation
-            self.label = f"Fehler: {str(e)}"
+        return height, round(height, 2)
 
-    def switchCalculation(self):
+    def switchMeasurementType(self):
+        """Toggle between 'Große Objekte' and 'Kleine Objekte'."""
         if self.measureTypeButton == "Große Objekte":
             self.measureTypeButton = "Kleine Objekte"
         else:
@@ -136,10 +161,13 @@ class RootWidget(RelativeLayout):
 
         self.resetMeasurements()
 
+        return self.measureTypeButton
+
     def resetMeasurements(self):
         self.distanceRounded = 0
         self.heightRounded = 0
         self.step = 0
+#----------------------------------------------------------------------------------
 
 class Main(MDApp):
 
