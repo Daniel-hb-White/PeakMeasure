@@ -139,7 +139,7 @@ class RootWidget(RelativeLayout):
                     subHeight = abs((self.distance * math.tan(math.radians(self.pitch))))
                     height = h - subHeight
                     height = round(height, 2)
-                    self.update_label_height_value(height)"
+                    self.update_label_height_value(height)
                     self.step = 2
                 else:
                     #Step 3: Reset values in UI
