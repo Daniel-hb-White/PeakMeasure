@@ -48,7 +48,7 @@
             MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
                 anchor_y: "top"
-                padding: dp(30), dp(30)
+                padding: dp(20), dp(40), dp(20), dp(40)
                 md_bg_color: "white"
 
                 MDBoxLayout:  # BoxLayout für die zweite Seite
@@ -60,19 +60,19 @@
                     MDTextField:
                         text_color_normal: "black"
                         line_color_normal: "black"
+                        text_color_focus: "black"
+                        line_color_focus: "black"
                         size_hint_y: None
-                        height: dp(50)  # Höhe des Textfeldes
-                        mode: "outlined"  # Benutzt die Outline für das Textfeld
-                        width: dp(200)
-                        hint_text: ""  # Hinweistext im Textfeld
                         text: "1.5"
+                        required: True
 
                         on_text: root.text_field_person_height_on_text(self.text)
-                        MDTextFieldHintText:
-                            text: "Höhe Ihres Gerätes in Metern"
+                        MDTextFieldHelperText:
+                            text: "Gehaltene Höhe Ihres Gerätes in Metern"
+                            mode: "persistent"
 
                     MDLabel:
-                        text: "[b]Anleitung:[/b]\n\n"
+                        text: "[b]Bedienungsanleitung:[/b]\n\n"
                         markup: True
                         color: "black"    
 
