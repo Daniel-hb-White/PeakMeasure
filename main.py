@@ -19,6 +19,7 @@ if platform == "android":
 class RootWidget(RelativeLayout):
     # Measurement values
     distanceRounded = NumericProperty(0)
+    distance = NumericProperty(0)
     heightRounded = NumericProperty(0)
     step = NumericProperty(0)
     label = StringProperty("")
@@ -71,12 +72,12 @@ class RootWidget(RelativeLayout):
         try:
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
-                distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.pitch)
+                self.distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.pitch)
                 self.step = 1
 
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
-                height, self.heightRounded = self.measurementsHandler.calculateHeight(distance, self.orientationHandler.pitch)
+                height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.pitch)
                 self.step = 2
             else:
                 #Step 3: Reset values in UI
