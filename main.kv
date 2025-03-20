@@ -3,10 +3,14 @@
         direction: "left"
 
         MDFloatLayout:
-            Camera:
-                id: camera
-                play: False
+            Image:
+                id: image_camera
                 fit_mode: "cover"
+
+            Camera:
+                id: hidden_camera
+                play: False
+                opacity: 0 
 
             MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
