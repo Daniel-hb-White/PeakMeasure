@@ -129,8 +129,7 @@ class RootWidget(RelativeLayout):
             else:
                 if self.step == 0:
                     # Step 1: Calculate distance using the pitch angle
-                    angle = 90 - self.pitch
-                    self.distance = abs(h / math.tan(math.radians(angle)))
+                    self.distance = abs(h / math.tan(math.radians(self.pitch)))
                     distance = round(self.distance, 2)
                     self.update_label_distance_value(distance)
                     self.step = 1
