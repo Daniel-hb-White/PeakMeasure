@@ -11,6 +11,11 @@ if platform == "android":
 
 class RootWidget(RelativeLayout):
 
+    def enable_camera(self):
+        camera = self.ids.camera
+        if camera:
+            camera.play = True
+
     def update_labe_distance_value(self, distance):
         self.ids.label_distance.text = f"Distanz:\n{distance}m"
 
@@ -28,17 +33,7 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
-        if platform not in ["android", "ios"]:
-            Window.size = (360, 640)
-        elif platform == "android":
-            self.request_app_permissions()
-
         return RootWidget()
-
-    def enable_camera(self):
-        camera = self.root.ids.get("camera")
-        if camera:
-            camera.play = True
 
     def show_permission_popup(self):
         dialog = MDDialog(
@@ -59,10 +54,18 @@ class Main(MDApp):
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
             print("Success: Camera permission granted.")
-            self.enable_camera()
+            self.root.enable_camera()
         else:
             print("Error: Camera permission not granted.")
             self.show_permission_popup()
+
+    def on_start(self):
+        if platform not in ["android", "ios"]:
+            Window.size = (360, 640)
+        elif platform == "android":
+            self.request_app_permissions()
+
+        self.root.enable_camera()
 
 
 Main().run()
