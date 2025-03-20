@@ -1,3 +1,6 @@
+import json
+import os
+from datetime import datetime
 from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.uix.relativelayout import RelativeLayout
@@ -7,7 +10,11 @@ from kivymd.uix.button import MDButton
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission  # type: ignore
-
+    from kivy.app import App
+    
+    documents_path = os.path.join(App.get_running_app().user_data_dir, "height_data.json")
+else:
+    documents_path = os.path.join(os.getcwd(), "height_data.json")
 
 class RootWidget(RelativeLayout):
 
@@ -19,6 +26,21 @@ class RootWidget(RelativeLayout):
 
     def text_field_person_height_on_text(self, text):
         print(f"Text entered: {text}")
+
+    def export_height_data_as_json(self, height=5.0):
+        data = {
+            "height": height,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        file_path = documents_path
+        
+        try:
+            with open(file_path, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+            print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
+        except Exception as e:
+            print(f"Fehler beim Speichern der Höhe: {e}")
 
 
 class Main(MDApp):
@@ -43,7 +65,7 @@ class Main(MDApp):
     def show_permission_popup(self):
         dialog = MDDialog(
             title="Permission Required",
-            text="Camera access is required to use this app. Please grant camera permission.",
+            text="Camera and Storage access are required to use this app. Please grant the required permissions.",
             buttons=[
                 MDButton(
                     text="Retry",
@@ -61,7 +83,7 @@ class Main(MDApp):
             print("Success: Camera permission granted.")
             self.enable_camera()
         else:
-            print("Error: Camera permission not granted.")
+            print("Error: Required permissions not granted.")
             self.show_permission_popup()
 
 
