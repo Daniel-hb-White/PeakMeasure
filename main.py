@@ -28,6 +28,7 @@ class RootWidget(RelativeLayout):
     distance = NumericProperty(0)
     label = StringProperty("")
     step = NumericProperty(0)    # Step tracker (0 = measuring distance, 1 = measuring height, 2 = reset values)
+    measureTypeButton = StringProperty("Große Objekte")
 
     facade = ObjectProperty()
 
@@ -85,7 +86,13 @@ class RootWidget(RelativeLayout):
         if spatialorientation.orientation != (None, None, None):
             azimuth, pitch, roll = spatialorientation.orientation
             self.azimuth = azimuth * (180/math.pi)
-            self.pitch = pitch * (180/math.pi) * -1
+            self.pitch = 90 - (pitch * (180/math.pi) * -1)
+            #check border values -> lead to high results
+            if self.pitch < 1:
+                self.pitch = 1
+            elif self.pitch > 89:
+                self.pitch = 89
+            self.pitchRounded = round(self.pitch, 2)
             self.roll = roll * (180/math.pi)
     
     def on_measure_button(self):
@@ -101,28 +108,54 @@ class RootWidget(RelativeLayout):
             if self.personHeight != None:
                 h = self.personHeight
 
-            if self.step == 0:
-                # Step 1: Calculate distance using the pitch angle
-                self.distance = h * math.tan(self.pitch)
-                distance = round(self.distance, 2)
-                self.update_label_distance_value(distance)
-                self.step = 1
-            elif self.step == 1:
-                # Step 2: Calculate height using distance and new pitch angle
-                height = self.distance * math.tan(self.pitch) + h
-                height = round(height, 2)
-                self.update_label_height_value(height)
-                self.step = 2
+            if self.measureTypeButton == "Große Objekte":
+                if self.step == 0:
+                    # Step 1: Calculate distance using the pitch angle
+                    self.distance = abs(h / math.tan(math.radians(self.pitch)))
+                    distance = round(self.distance, 2)
+                    self.update_label_distance_value(distance)
+                    self.step = 1
+                elif self.step == 1:
+                    # Step 2: Calculate height using distance and new pitch angle
+                    height = abs((self.distance * math.tan(math.radians(self.pitch))) + h)
+                    height = round(height, 2)
+                    self.update_label_height_value(height)
+                    self.step = 2
+                else:
+                    #Step 3: Reset values in UI
+                    self.update_label_distance_value("")
+                    self.update_label_height_value("")
+                    self.step = 0
             else:
-                self.update_label_distance_value("")
-                self.update_label_height_value("")
-                self.step = 0
-
+                if self.step == 0:
+                    # Step 1: Calculate distance using the pitch angle
+                    angle = 90 - self.pitch
+                    self.distance = abs(h / math.tan(math.radians(angle)))
+                    distance = round(self.distance, 2)
+                    self.update_label_distance_value(distance)
+                    self.step = 1
+                elif self.step == 1:
+                    # Step 2: Calculate height using distance and new pitch angle
+                    subHeight = abs((self.distance * math.tan(math.radians(self.pitch))))
+                    height = h - subHeight
+                    height = round(height, 2)
+                    self.update_label_height_value(height)"
+                    self.step = 2
+                else:
+                    #Step 3: Reset values in UI
+                    self.update_label_distance_value("")
+                    self.update_label_height_value("")
+                    self.step = 0
 
         except Exception as e:
             # Handle any unexpected errors during calculation
             self.label = f"Fehler: {str(e)}"
 
+    def switchCalculation(self):
+        if self.measureTypeButton == "Große Objekte":
+            self.measureTypeButton = "Kleine Objekte"
+        else:
+            self.measureTypeButton = "Große Objekte"
 
 class Main(MDApp):
 

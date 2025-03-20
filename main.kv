@@ -64,3 +64,8 @@
                 size_hint_y: None
                 height: dp(40)
                 pos_hint: {"center_x": .5, "y": .2}
+            MDButton:
+                text: str(root.measureTypeButton)
+                width: dp(10)
+                height: dp(10)
+                on_press: root.switchCalculation()
