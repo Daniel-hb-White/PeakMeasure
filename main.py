@@ -108,43 +108,27 @@ class RootWidget(RelativeLayout):
             if self.personHeight != None:
                 h = self.personHeight
 
-            if self.measureTypeButton == "Große Objekte":
-                if self.step == 0:
-                    # Step 1: Calculate distance using the pitch angle
-                    self.distance = abs(h / math.tan(math.radians(self.pitch)))
-                    distance = round(self.distance, 2)
-                    self.update_label_distance_value(distance)
-                    self.step = 1
-                elif self.step == 1:
-                    # Step 2: Calculate height using distance and new pitch angle
-                    height = abs((self.distance * math.tan(math.radians(self.pitch))) + h)
-                    height = round(height, 2)
-                    self.update_label_height_value(height)
-                    self.step = 2
+            if self.step == 0:
+                # Step 1: Calculate distance using the pitch angle
+                self.distance = abs(h / math.tan(math.radians(self.pitch)))
+                distance = round(self.distance, 2)
+                self.update_label_distance_value(distance)
+                self.step = 1
+            elif self.step == 1:
+                # Step 2: Calculate height using distance and new pitch angle
+                height = abs(self.distance * math.tan(math.radians(self.pitch)))
+
+                if self.measureTypeButton == "Große Objekte":
+                    height = height + h
                 else:
-                    #Step 3: Reset values in UI
-                    self.update_label_distance_value("")
-                    self.update_label_height_value("")
-                    self.step = 0
+                    height = h - height
+
+                height = round(height, 2)
+                self.update_label_height_value(height)
+                self.step = 2
             else:
-                if self.step == 0:
-                    # Step 1: Calculate distance using the pitch angle
-                    self.distance = abs(h / math.tan(math.radians(self.pitch)))
-                    distance = round(self.distance, 2)
-                    self.update_label_distance_value(distance)
-                    self.step = 1
-                elif self.step == 1:
-                    # Step 2: Calculate height using distance and new pitch angle
-                    subHeight = abs((self.distance * math.tan(math.radians(self.pitch))))
-                    height = h - subHeight
-                    height = round(height, 2)
-                    self.update_label_height_value(height)
-                    self.step = 2
-                else:
-                    #Step 3: Reset values in UI
-                    self.update_label_distance_value("")
-                    self.update_label_height_value("")
-                    self.step = 0
+                #Step 3: Reset values in UI
+                self.resetMeasurements()    
 
         except Exception as e:
             # Handle any unexpected errors during calculation
@@ -155,6 +139,11 @@ class RootWidget(RelativeLayout):
             self.measureTypeButton = "Kleine Objekte"
         else:
             self.measureTypeButton = "Große Objekte"
+
+    def resetMeasurements(self):
+        self.update_label_distance_value("")
+        self.update_label_height_value("")
+        self.step = 0
 
 class Main(MDApp):
 
