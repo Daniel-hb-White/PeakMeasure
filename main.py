@@ -2,6 +2,8 @@ from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.uix.relativelayout import RelativeLayout
 from kivymd.app import MDApp
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission  # type: ignore
@@ -28,14 +30,39 @@ class Main(MDApp):
 
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
-        if platform == "android":
-            request_permissions([Permission.CAMERA])
-            if check_permission(Permission.CAMERA):
-                print("Camera permission granted.")
-            else:
-                print("Camera permission not granted.")
+        elif platform == "android":
+            self.request_app_permissions()
 
         return RootWidget()
+
+    def enable_camera(self):
+        camera = self.root.ids.get("camera")
+        if camera:
+            camera.play = True
+
+    def show_permission_popup(self):
+        dialog = MDDialog(
+            title="Permission Required",
+            text="Camera access is required to use this app. Please grant camera permission.",
+            buttons=[
+                MDFlatButton(
+                    text="Retry",
+                    on_release=self.request_app_permissions
+                )
+            ],
+        )
+        dialog.open()
+
+    def request_app_permissions(self):
+        request_permissions([Permission.CAMERA], self.on_app_permissions_result)
+
+    def on_app_permissions_result(self, permissions, results):
+        if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
+            print("Success: Camera permission granted.")
+            self.enable_camera()
+        else:
+            print("Error: Camera permission not granted.")
+            self.show_permission_popup()
 
 
 Main().run()
