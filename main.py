@@ -3,7 +3,7 @@ from kivy.utils import platform
 from kivy.uix.relativelayout import RelativeLayout
 from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton
+from kivymd.uix.button import MDButton
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission  # type: ignore
@@ -45,7 +45,7 @@ class Main(MDApp):
             title="Permission Required",
             text="Camera access is required to use this app. Please grant camera permission.",
             buttons=[
-                MDFlatButton(
+                MDButton(
                     text="Retry",
                     on_release=self.request_app_permissions
                 )
