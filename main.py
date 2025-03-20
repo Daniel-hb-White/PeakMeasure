@@ -62,10 +62,11 @@ class Main(MDApp):
     def on_start(self):
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
+            self.root.enable_camera()
         elif platform == "android":
             self.request_app_permissions()
 
-        self.root.enable_camera()
+
 
 
 Main().run()
