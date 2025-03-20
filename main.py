@@ -26,6 +26,8 @@ class RootWidget(RelativeLayout):
 
     # Measurement values
     distance = NumericProperty(0)
+    distanceRounded = NumericProperty(0)
+    heightRounded = NumericProperty(0)
     label = StringProperty("")
     step = NumericProperty(0)    # Step tracker (0 = measuring distance, 1 = measuring height, 2 = reset values)
     measureTypeButton = StringProperty("Große Objekte")
@@ -60,12 +62,6 @@ class RootWidget(RelativeLayout):
     def on_stop(self):
         if self.capture is not None and self.capture.isOpened():
             self.capture.release()
-
-    def update_label_distance_value(self, distance):
-        self.ids.label_distance.text = f"Distanz:\n{distance}m"
-
-    def update_label_height_value(self, height):
-        self.ids.label_height.text = f"Höhe:\n{height}m"
 
     def text_field_person_height_on_text(self, text):
         print(f"Text entered: {text}")
@@ -111,8 +107,7 @@ class RootWidget(RelativeLayout):
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
                 self.distance = abs(h / math.tan(math.radians(self.pitch)))
-                distance = round(self.distance, 2)
-                self.update_label_distance_value(distance)
+                self.distanceRounded = round(self.distance, 2)
                 self.step = 1
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
@@ -123,8 +118,7 @@ class RootWidget(RelativeLayout):
                 else:
                     height = h - height
 
-                height = round(height, 2)
-                self.update_label_height_value(height)
+                self.heightRounded = round(height, 2)
                 self.step = 2
             else:
                 #Step 3: Reset values in UI
@@ -140,9 +134,11 @@ class RootWidget(RelativeLayout):
         else:
             self.measureTypeButton = "Große Objekte"
 
+        self.resetMeasurements()
+
     def resetMeasurements(self):
-        self.update_label_distance_value("")
-        self.update_label_height_value("")
+        self.distanceRounded = 0
+        self.heightRounded = 0
         self.step = 0
 
 class Main(MDApp):

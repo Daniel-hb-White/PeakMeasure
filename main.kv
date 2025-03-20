@@ -23,7 +23,7 @@
                         padding: dp(4), dp(4)
                         halign: "center"
                         multiline: True
-                        text: "Distanz:\n0m"
+                        text: "Distanz: " + str(root.distanceRounded) + "m"
 
                     MDLabel:
                         id: label_height
@@ -31,7 +31,7 @@
                         padding: dp(4), dp(4)
                         halign: "center"
                         multiline: True
-                        text: "Höhe:\nN/A"
+                        text: "Höhe: " + str(root.heightRounded) + "m"
                     
                     MDButton:
                         text: "Berechnen"
