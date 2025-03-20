@@ -20,10 +20,9 @@ class RootWidget(RelativeLayout):
     # Measurement values
     distanceRounded = NumericProperty(0)
     heightRounded = NumericProperty(0)
+    step = NumericProperty(0)
     label = StringProperty("")
     measureTypeButton = StringProperty("Große Objekte")
-
-    facade = ObjectProperty()
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -81,7 +80,7 @@ class RootWidget(RelativeLayout):
                 self.step = 2
             else:
                 #Step 3: Reset values in UI
-                self.measurementsHandler.resetMeasurements()    
+                self.resetMeasurements()    
 
         except Exception as e:
             # Handle any unexpected errors during calculation
@@ -89,6 +88,12 @@ class RootWidget(RelativeLayout):
     
     def switchMeasurementType(self):
         self.measureTypeButton = self.measurementsHandler.switchMeasurementType()
+        self.resetMeasurements()
+    
+    def resetMeasurements(self):
+        self.distanceRounded = 0
+        self.heightRounded = 0
+        self.step = 0
 
 #---------------------------- OrientationHandler ---------------------------------
 class OrientationHandler:
@@ -125,11 +130,6 @@ class OrientationHandler:
 #----------------------------- MeasurementHandler ---------------------------------
 class MeasurementHandler:
     def __init__(self):
-        self.distance = 0
-        self.distanceRounded = 0
-        self.height = 0
-        self.heightRounded = 0
-        self.step = 0
         self.personHeight = 1.5  # Default height in meters
         self.measureTypeButton = "Große Objekte"
 
@@ -159,14 +159,8 @@ class MeasurementHandler:
         else:
             self.measureTypeButton = "Große Objekte"
 
-        self.resetMeasurements()
-
         return self.measureTypeButton
 
-    def resetMeasurements(self):
-        self.distanceRounded = 0
-        self.heightRounded = 0
-        self.step = 0
 #----------------------------------------------------------------------------------
 
 class Main(MDApp):
@@ -192,10 +186,10 @@ class Main(MDApp):
     
     def on_start(self):
         self.root.start_camera()
-        self.root.enable_listener()
+        self.root.orientationHandler.enable_listener()
 
     def on_stop(self):
         self.root.on_stop()
-        self.root.disable_listener()
+        self.root.orientationHandler.disable_listener()
 
 Main().run()
