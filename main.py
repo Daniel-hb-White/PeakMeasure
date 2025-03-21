@@ -9,16 +9,37 @@ from kivy.graphics.texture import Texture
 from kivy.clock import Clock
 
 if platform == "android":
-    from android.permissions import request_permissions, Permission  # type: ignore
+    from android.permissions import request_permissions, Permission, check_permission  # type: ignore
 
 
 class RootWidget(RelativeLayout):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Schedule a check for camera permissions in the main thread
+        Clock.schedule_interval(self.check_camera_permissions, 1)
+
+    def check_camera_permissions(self, *args):
+        if platform == "android":
+            if check_permission(Permission.CAMERA):
+                print("Success: Camera permission already granted.")
+                self.setup_camera()
+                Clock.unschedule(self.check_camera_permissions)
+            else:
+                print("Error: Camera permission not granted yet.")
+        else:
+            # On non-Android platforms, simulate permission granted
+            self.setup_camera()
+            Clock.unschedule(self.check_camera_permissions)
+
     def setup_camera(self):
+        print("Setting up the camera...")
         window_width, window_height = Window.size
         # Hidden camera widget only for accessing the camera; not visible
         self.camera = Camera(resolution=(int(window_width), int(window_height)), play=True, opacity=0)
-        Clock.schedule_once(lambda x: self.add_widget(self.camera))
+        self.add_widget(self.camera)
+
+        # Schedule the update_image method to process the camera feed
         Clock.schedule_interval(self.update_image, 1.0 / 30.0)
 
     def update_image(self, dt):
@@ -53,32 +74,22 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
-        self.root = RootWidget()
-
-        if platform in ["android", "ios"]:
+        # Ask for permissions if on Android
+        if platform ==  "android":
             self.request_app_permissions()
         else:
-            # Simulate permissions granted on non-mobile platforms
-            self.on_permissions_granted()
+            Window.size = (360, 640)
+
+        return RootWidget()
 
     def request_app_permissions(self):
-        if platform == "android":
-            request_permissions([Permission.CAMERA], self.on_app_permissions_result)
-        else:
-            # Simulate permission granted on non-Android platforms
-            self.on_permissions_granted()
+        request_permissions([Permission.CAMERA], self.on_app_permissions_result)
 
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
             print("Success: Camera permission granted.")
-            self.on_permissions_granted()
         else:
             print("Error: Camera permission not granted.")
 
-    def on_permissions_granted(self):
-        print("Starting RootWidget...")
-        if platform not in ["android", "ios"]:
-            Window.size = (360, 640)
-        self.root.setup_camera()
 
 Main().run()
