@@ -1,10 +1,11 @@
+from PIL import Image
+import numpy as np
 from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.uix.relativelayout import RelativeLayout
 from kivymd.app import MDApp
-from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDButton
-from kivy.uix.camera import Camera
+from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
+from kivymd.uix.button import MDButton, MDButtonText
 from kivy.graphics.texture import Texture
 from kivy.clock import Clock
 
@@ -18,30 +19,22 @@ class RootWidget(RelativeLayout):
         self.camera = self.ids.hidden_camera
         if self.camera:
             self.camera.play = True
-            Clock.schedule_interval(self.update_image, 1.0/30.0)
+            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+
 
     def update_image(self, dt):
         if self.camera and self.camera.texture:
             texture = self.camera.texture
             width, height = texture.size
 
-            # Create a new texture with swapped dimensions
-            rotated_texture = Texture.create(size=(height, width), colorfmt='rgba')
+            pixels = np.frombuffer(texture.pixels, dtype=np.uint8).reshape(height, width, 4)
+            pil_image = Image.fromarray(pixels, mode='RGBA')
 
-            # Rearrange pixel data for -90° rotation and mirroring
-            pixels = texture.pixels
-            flipped_pixels = bytearray(len(pixels))
+            transformed_image = pil_image.rotate(90, expand=True)
 
-            for y in range(height):
-                for x in range(width):
-                    old_index = (y * width + x) * 4
-                    new_index = ((width - x - 1) * height + (height - y - 1)) * 4  # Rotate -90° and mirror
-                    flipped_pixels[new_index:new_index + 4] = pixels[old_index:old_index + 4]
+            rotated_texture = Texture.create(size=(transformed_image.width, transformed_image.height), colorfmt='rgba')
+            rotated_texture.blit_buffer(transformed_image.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
 
-            # Assign the rearranged pixel data to the new texture
-            rotated_texture.blit_buffer(flipped_pixels, colorfmt='rgba', bufferfmt='ubyte')
-
-            # Update the image widget with the new texture
             self.ids.image_camera.texture = rotated_texture
 
     def update_labe_distance_value(self, distance):
@@ -61,40 +54,50 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
-        return RootWidget()
-
-    def show_permission_popup(self):
-        dialog = MDDialog(
-            title="Permission Required",
-            text="Camera access is required to use this app. Please grant camera permission.",
-            buttons=[
-                MDButton(
-                    text="Retry",
-                    on_release=self.request_app_permissions
-                )
-            ],
-        )
-        dialog.open()
+        if platform in ["android", "ios"]:
+            self.request_app_permissions()
+        else:
+            # Simulate permissions granted on non-mobile platforms
+            self.on_permissions_granted()
 
     def request_app_permissions(self):
-        request_permissions([Permission.CAMERA], self.on_app_permissions_result)
+        if platform == "android":
+            request_permissions([Permission.CAMERA], self.on_app_permissions_result)
+        else:
+            # Simulate permission granted on non-Android platforms
+            self.on_permissions_granted()
 
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
             print("Success: Camera permission granted.")
-            self.root.setup_camera()
+            self.on_permissions_granted()
         else:
             print("Error: Camera permission not granted.")
             self.show_permission_popup()
 
-    def on_start(self):
+    def on_permissions_granted(self):
+        print("Starting RootWidget...")
+        self.root = RootWidget()
+        self.root.setup_camera()
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
-            self.root.setup_camera()
-        elif platform == "android":
-            self.request_app_permissions()
 
-
-
+    def show_permission_popup(self):
+        print("Showing permission popup")
+        MDDialog(
+            MDDialogHeadlineText(
+                text="Permissions Required"
+            ),
+            MDDialogSupportingText(
+                text="Camera access is required to use this app. Please grant camera permission."
+            ),
+            MDDialogButtonContainer(
+                MDButton(
+                    MDButtonText(text="Grant Permissons"),
+                    style="text",
+                    on_release=lambda _: self.request_app_permissions()
+                ),
+            )
+        ).open()
 
 Main().run()

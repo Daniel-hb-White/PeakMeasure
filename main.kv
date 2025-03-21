@@ -3,19 +3,19 @@
         direction: "left"
 
         MDFloatLayout:
-            Image:
+            Image: # Image displaying the transformed camera output
                 id: image_camera
                 fit_mode: "cover"
 
-            Camera:
+            Camera: # Hidden camera widget only for accessing the camera, not visible
                 id: hidden_camera
                 play: False
                 opacity: 0 
 
-            MDAnchorLayout:  # AnchorLayout for screen position
+            MDAnchorLayout: # AnchorLayout for screen position
                 anchor_x: "center"
                 anchor_y: "top"
-                MDBoxLayout:  # BoxLayout for size, etc.
+                MDBoxLayout: # BoxLayout for size, etc.
                     orientation: "horizontal"
                     size_hint: None, None
                     size: dp(280), dp(100)
