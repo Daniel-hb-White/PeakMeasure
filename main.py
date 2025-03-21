@@ -1,23 +1,17 @@
-from PIL import Image
 import numpy as np
+from PIL import Image
+from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.uix.relativelayout import RelativeLayout
-from kivymd.app import MDApp
-from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogSupportingText, MDDialogButtonContainer
-from kivymd.uix.button import MDButton, MDButtonText
 from kivy.graphics.texture import Texture
 from kivy.clock import Clock
 
 if platform == "android":
-    from android.permissions import request_permissions, Permission, check_permission  # type: ignore
+    from android.permissions import request_permissions, Permission  # type: ignore
 
 
 class RootWidget(RelativeLayout):
-
-    def __init__(self, **kw):
-        super().__init__(**kw)
-        self.setup_camera()
 
     def setup_camera(self):
         self.camera = self.ids.hidden_camera
@@ -58,6 +52,8 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
+        self.root = RootWidget()
+
         if platform in ["android", "ios"]:
             self.request_app_permissions()
         else:
@@ -82,6 +78,6 @@ class Main(MDApp):
         print("Starting RootWidget...")
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
-        self.root = RootWidget()
+        self.root.setup_camera()
 
 Main().run()
