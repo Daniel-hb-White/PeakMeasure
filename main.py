@@ -18,8 +18,7 @@ class RootWidget(RelativeLayout):
         window_width, window_height = Window.size
         # Hidden camera widget only for accessing the camera; not visible
         self.camera = Camera(resolution=(int(window_width), int(window_height)), play=True, opacity=0)
-        self.add_widget(self.camera)
-
+        Clock.schedule_once(lambda x: self.add_widget(self.camera))
         Clock.schedule_interval(self.update_image, 1.0 / 30.0)
 
     def update_image(self, dt):
