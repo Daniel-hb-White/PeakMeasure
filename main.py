@@ -15,6 +15,10 @@ if platform == "android":
 
 class RootWidget(RelativeLayout):
 
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.setup_camera()
+
     def setup_camera(self):
         self.camera = self.ids.hidden_camera
         if self.camera:
@@ -73,31 +77,11 @@ class Main(MDApp):
             self.on_permissions_granted()
         else:
             print("Error: Camera permission not granted.")
-            self.show_permission_popup()
 
     def on_permissions_granted(self):
         print("Starting RootWidget...")
-        self.root = RootWidget()
-        self.root.setup_camera()
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
-
-    def show_permission_popup(self):
-        print("Showing permission popup")
-        MDDialog(
-            MDDialogHeadlineText(
-                text="Permissions Required"
-            ),
-            MDDialogSupportingText(
-                text="Camera access is required to use this app. Please grant camera permission."
-            ),
-            MDDialogButtonContainer(
-                MDButton(
-                    MDButtonText(text="Grant Permissons"),
-                    style="text",
-                    on_release=lambda _: self.request_app_permissions()
-                ),
-            )
-        ).open()
+        self.root = RootWidget()
 
 Main().run()
