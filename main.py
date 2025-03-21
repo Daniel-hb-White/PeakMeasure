@@ -3,6 +3,7 @@ from PIL import Image
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.utils import platform
+from kivy.uix.camera import Camera
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.graphics.texture import Texture
 from kivy.clock import Clock
@@ -14,11 +15,11 @@ if platform == "android":
 class RootWidget(RelativeLayout):
 
     def setup_camera(self):
-        self.camera = self.ids.hidden_camera
-        if self.camera:
-            self.camera.play = True
-            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+        # Hidden camera widget only for accessing the camera; not visible
+        self.camera = Camera(play=True, opacity=0)
+        self.add_widget(self.camera)
 
+        Clock.schedule_interval(self.update_image, 1.0 / 30.0)
 
     def update_image(self, dt):
         if self.camera and self.camera.texture:
