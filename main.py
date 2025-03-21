@@ -39,6 +39,12 @@ class RootWidget(RelativeLayout):
             with open(file_path, "w") as json_file:
                 json.dump(data, json_file, indent=4)
             print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
+            
+            # Überprüfen, ob die Datei erfolgreich gespeichert wurde
+            with open(file_path, "r") as json_file:
+                content = json.load(json_file)
+                print("Gespeicherte JSON-Daten:", content)
+                
         except Exception as e:
             print(f"Fehler beim Speichern der Höhe: {e}")
 
@@ -85,6 +91,9 @@ class Main(MDApp):
         else:
             print("Error: Required permissions not granted.")
             self.show_permission_popup()
-
+    
+    def on_start(self):
+        # Testaufruf der JSON-Export-Funktion
+        self.root.export_height_data_as_json(1.75)
 
 Main().run()
