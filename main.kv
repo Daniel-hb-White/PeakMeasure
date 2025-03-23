@@ -17,6 +17,7 @@
                     padding: 20
                     spacing: 10
 
+                    # Label to show the calculated distance
                     MDLabel:
                         id: label_distance
                         md_bg_color: [0, 0, 0, 0.3]
@@ -25,6 +26,7 @@
                         multiline: True
                         text: "Distanz: " + str(root.distanceRounded) + "m"
 
+                    # Label to show the calculated height
                     MDLabel:
                         id: label_height
                         md_bg_color: [0, 0, 0, 0.3]
@@ -33,13 +35,13 @@
                         multiline: True
                         text: "Höhe: " + str(root.heightRounded) + "m"
                     
+                    # Button to calculate (3 steps) needs to be replaced with touch on screen
                     MDButton:
                         text: "Berechnen"
                         size_hint: None, None
                         width: dp(100)
                         height: dp(100)
                         on_press: root.on_measure_button()
-
 
                 MDAnchorLayout:
                     anchor_x: "center"
@@ -64,6 +66,17 @@
                 size_hint_y: None
                 height: dp(40)
                 pos_hint: {"center_x": .5, "y": .2}
+
+            # Label to show the input error
+            MDLabel:
+                text: str(root.label)
+                theme_text_color: "Red"
+                halign: "center"
+                size_hint_y: None
+                height: dp(40)
+                pos_hint: {"center_x": .5, "y": .2}
+
+            # Button to switch the calculation mode
             MDButton:
                 width: dp(100)
                 height: dp(100)
