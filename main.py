@@ -305,7 +305,7 @@ class Main(MDApp):
         elif platform == "android":
             self.request_app_permissions()
         self.root.orientationHandler.enable_listener()
-    #    self.root.export_height_data_as_json(1.75)
+        self.root.export_height_data_as_json(1.75)
 
     def on_stop(self):
         self.root.orientationHandler.disable_listener()
