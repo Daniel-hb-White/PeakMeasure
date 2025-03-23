@@ -8,14 +8,14 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,mp3
 
 version = 0.1
-requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/master.zip,materialyoucolor,exceptiongroup,asyncgui,asynckivy,plyer,numpy,pillow
+requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/master.zip,materialyoucolor,exceptiongroup,asyncgui,asynckivy,plyer,numpy,pillow,android
 
 icon.filename = mokup_und_logo/PeakMeasureLogo.png
 
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a
-android.permissions = CAMERA
+android.permissions = CAMERA, READ_INTERNAL_STORAGE, WRITE_INTERNAL_STORAGE 
 #p4a.branch = release-2022.12.20
 
 # iOS specific
