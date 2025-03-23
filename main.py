@@ -44,7 +44,6 @@ class RootWidget(ScreenManager):
     def on_touch_down(self, touch):
         self.touch_start_x = touch.x
         print("Pressed screen at:", touch.x)
-        self.on_measure_button()
         return super().on_touch_down(touch)
 
     def on_touch_up(self, touch):
@@ -58,6 +57,9 @@ class RootWidget(ScreenManager):
             else:
                 self.transition.direction = "left"
                 self.current = "screen_camera"
+        else:
+            if self.current == "screen_camera":
+                self.on_measure_button()
 
     def setup_camera(self):
         self.camera = self.ids.hidden_camera
