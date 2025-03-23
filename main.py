@@ -85,11 +85,10 @@ class RootWidget(ScreenManager):
         """
         # Create hidden camera widget used only for accessing the camera, not visible
         if check_permission(Permission.CAMERA):
-            if not self.camera:
-                self.camera = Camera(play=True, opacity=0)
-                self.add_widget(self.camera)
-                Clock.schedule_interval(self.update_image, 1.0 / 30.0)
-                print("Camera setup complete.")
+            self.camera = Camera(play=True, opacity=0)
+            self.add_widget(self.camera)
+            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+            print("Camera setup complete.")
 
     def update_image(self, dt):
         """
