@@ -1,6 +1,5 @@
 import math
 import json
-import os
 import numpy as np
 from PIL import Image
 from kivymd.app import MDApp
@@ -52,17 +51,18 @@ class RootWidget(ScreenManager):
         Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
         """
         print("Setting up camera..")
-        # Create hidden camera widget used only for accessing the camera, not visible
         if check_permission(Permission.CAMERA):
+            # Create hidden camera widget used only for accessing the camera feed
             self.camera = Camera(play=True, opacity=0)
             self.ids.screen_camera.add_widget(self.camera)
+            # Schedule the camera feed update at 30 FPS
             Clock.schedule_interval(self.update_image, 1.0 / 30.0)
             print("Camera setup complete.")
 
     def update_image(self, dt):
         """
         Update the camera feed by rotating the image received from Kivy's 'Camera' widget,
-        then displaying it on the screen per 'Image' widget.
+        then displaying it on the screen by updating the 'Image' widget.
 
         :param dt: The time interval since the last update.
         """
@@ -70,14 +70,18 @@ class RootWidget(ScreenManager):
             texture = self.camera.texture
             width, height = texture.size
 
+            # Convert the texture to a NumPy array for manipulation
             pixels = np.frombuffer(texture.pixels, dtype=np.uint8).reshape(height, width, 4)
             pil_image = Image.fromarray(pixels, mode='RGBA')
 
+            # Rotate the image by 90 degrees
             transformed_image = pil_image.rotate(90, expand=True)
 
+            # Create a new texture from the rotated image
             rotated_texture = Texture.create(size=(transformed_image.width, transformed_image.height), colorfmt='rgba')
             rotated_texture.blit_buffer(transformed_image.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
 
+            # Update the texture of the Image widget
             self.ids.image_camera.texture = rotated_texture
 
     def on_touch_down(self, touch):
@@ -94,7 +98,7 @@ class RootWidget(ScreenManager):
         """
         Handle touch up events and determine if a swipe gesture occurred.
         If the swipe is large enough, navigate to the appropriate screen.
-        if not then act as a normal button (start height calculation process).
+        if not then act as a normal button (start process of height calculation).
 
         :param touch: The touch event object containing touch details.
         """
@@ -181,23 +185,25 @@ class RootWidget(ScreenManager):
         self.step = 0
 
     def export_height_data_as_json(self, height):
+        """
+        Export the calculated height data as a JSON file.
+
+        :param height: The height value to save.
+        """
         data = {
             "height": height,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        
         file_path = documents_path
         
         try:
             with open(file_path, "w") as json_file:
                 json.dump(data, json_file, indent=4)
             print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
-            
-            # Überprüfen, ob die Datei erfolgreich gespeichert wurde
+            # Verify that the file was saved successfully
             with open(file_path, "r") as json_file:
                 content = json.load(json_file)
                 print("Gespeicherte JSON-Daten:", content)
-                
         except Exception as e:
             print(f"Fehler beim Speichern der Höhe: {e}")
 
@@ -246,7 +252,6 @@ class OrientationHandler:
             self.pitchRounded = round(self.pitch, 2)
             self.roll = roll * (180/math.pi)
 
-#----------------------------------------------------------------------------------
 #----------------------------- MeasurementHandler ---------------------------------
 class MeasurementHandler:
     """
@@ -313,14 +318,21 @@ class MeasurementHandler:
 #----------------------------------------------------------------------------------
 
 class Main(MDApp):
+    """
+    Main application class that initializes and runs the KivyMD app.
+    """
 
     def build(self):
+        """
+        Build the application UI and initialize platform-specific settings.
+        """
         self.icon = './mokup_und_logo/PeakMeasureLogo.png'
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
         self.root = RootWidget()
 
+        # Handle platform-specific configurations
         if platform not in ["android", "ios"]:
             Window.size = (360, 640)
             self.root.setup_camera()
@@ -330,9 +342,18 @@ class Main(MDApp):
         return self.root
     
     def request_app_permissions(self):
+        """
+        Request necessary permissions for the app to function on Android.
+        """
         request_permissions([Permission.CAMERA], self.on_app_permissions_result)
 
     def on_app_permissions_result(self, permissions, results):
+        """
+        Handle the result of the permission request.
+
+        :param permissions: List of requested permissions.
+        :param results: List of results for each permission.
+        """
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
             print("Success: Required permissions granted.")
             self.root.setup_camera()
@@ -340,9 +361,15 @@ class Main(MDApp):
             print("Error: Required permissions not granted.")
 
     def on_start(self):
+        """
+        Called when the app starts. Enables the orientation sensor listener.
+        """
         self.root.orientationHandler.enable_listener()
 
     def on_stop(self):
+        """
+        Called when the app stops. Disables the orientation sensor listener.
+        """
         self.root.orientationHandler.disable_listener()
 
 
