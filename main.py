@@ -3,8 +3,7 @@ from PIL import Image
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.utils import platform
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.camera import Camera
+from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.graphics.texture import Texture
 
 from kivy.clock import Clock
@@ -13,7 +12,27 @@ if platform == "android":
     from android.permissions import request_permissions, Permission  # type: ignore
 
 
-class RootWidget(RelativeLayout):
+class RootWidget(ScreenManager):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.transition = SlideTransition()
+        self.touch_start_x = 0
+
+    def on_touch_down(self, touch):
+        self.touch_start_x = touch.x
+        print("Pressed screen at:", touch.x)
+
+    def on_touch_up(self, touch):
+        touch_end_x = touch.x
+        delta_x = touch_end_x - self.touch_start_x
+
+        if abs(delta_x) > 100:
+            if delta_x > 0:
+                self.transition.direction = "right"
+                self.current = "screen_settings"
+            else:
+                self.transition.direction = "left"
+                self.current = "screen_camera"
 
     def setup_camera(self):
         self.camera = self.ids.hidden_camera

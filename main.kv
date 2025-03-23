@@ -1,13 +1,12 @@
 <RootWidget>:
-    Carousel:
-        direction: "left"
-
+    Screen:
+        name: "screen_camera"
         MDFloatLayout:
-            Image: # Image displaying the transformed camera output
+            Image:  # Image displaying the transformed camera output
                 id: image_camera
                 fit_mode: "cover"
 
-            Camera: # Hidden camera widget only for accessing the camera, not visible
+            Camera:  # Hidden camera widget only for accessing the camera, not visible
                 id: hidden_camera
                 play: False
                 opacity: 0 
@@ -15,7 +14,7 @@
             MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
                 anchor_y: "top"
-                MDBoxLayout:  # BoxLayout for size, etc.
+                MDBoxLayout: # BoxLayout for size, etc.
                     orientation: "horizontal"
                     size_hint: None, None
                     size: dp(280), dp(100)
@@ -47,6 +46,8 @@
                         icon: "plus"
                         icon_color: [1, 1, 1, 1]
 
+    Screen:
+        name: "screen_settings"
         MDFloatLayout:
             MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
@@ -54,7 +55,7 @@
                 padding: dp(20), dp(40), dp(20), dp(40)
                 md_bg_color: "white"
 
-                MDBoxLayout:  # BoxLayout für die zweite Seite
+                MDBoxLayout:  # BoxLayout for the second page
                     orientation: "vertical"
                     md_bg_color: "white"
                     size_hint: None, None
