@@ -40,14 +40,6 @@
                         halign: "center"
                         multiline: True
                         text: "Höhe: " + str(root.heightRounded) + "m"
-                    
-                    # Button to calculate (3 steps) needs to be replaced with touch on screen
-                    MDButton:
-                        text: "Berechnen"
-                        size_hint: None, None
-                        width: dp(100)
-                        height: dp(100)
-                        on_press: root.on_measure_button()
 
                 MDAnchorLayout:
                     anchor_x: "center"
