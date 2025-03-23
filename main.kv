@@ -21,6 +21,7 @@
                     padding: 20
                     spacing: 10
 
+                    # Label to show the calculated distance
                     MDLabel:
                         id: label_distance
                         color: "white"
@@ -28,8 +29,9 @@
                         padding: dp(4), dp(4)
                         halign: "center"
                         multiline: True
-                        text: "Distanz:\n0m"
+                        text: "Distanz: " + str(root.distanceRounded) + "m"
 
+                    # Label to show the calculated height
                     MDLabel:
                         id: label_height
                         color: "white"
@@ -37,7 +39,15 @@
                         padding: dp(4), dp(4)
                         halign: "center"
                         multiline: True
-                        text: "Höhe:\nN/A"
+                        text: "Höhe: " + str(root.heightRounded) + "m"
+                    
+                    # Button to calculate (3 steps) needs to be replaced with touch on screen
+                    MDButton:
+                        text: "Berechnen"
+                        size_hint: None, None
+                        width: dp(100)
+                        height: dp(100)
+                        on_press: root.on_measure_button()
 
                 MDAnchorLayout:
                     anchor_x: "center"
@@ -85,3 +95,29 @@
                         color: "black"
                         markup: True
                         font_size: 10
+
+            # Label to show the input error
+            MDLabel:
+                text: str(root.label)
+                theme_text_color: "Secondary"
+                halign: "center"
+                size_hint_y: None
+                height: dp(40)
+                pos_hint: {"center_x": .5, "y": .2}
+
+            # Label to show the input error
+            MDLabel:
+                text: str(root.label)
+                theme_text_color: "Secondary"
+                halign: "center"
+                size_hint_y: None
+                height: dp(40)
+                pos_hint: {"center_x": .5, "y": .1}
+
+            # Button to switch the calculation mode
+            MDButton:
+                width: dp(100)
+                height: dp(100)
+                on_press: root.switchMeasurementType()
+                MDButtonText:
+                    text: str(root.measureTypeButton)
