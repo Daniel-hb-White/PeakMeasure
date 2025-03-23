@@ -22,8 +22,6 @@ from kivy.properties import StringProperty
 if platform == "android":
     from android.permissions import request_permissions, Permission # type: ignore
     documents_path = "./height_data.json"
-else:
-    documents_path = os.path.join(os.getcwd(), "height_data.json")
 
 class RootWidget(ScreenManager):
     # Measurement values
@@ -89,15 +87,6 @@ class RootWidget(ScreenManager):
         self.ids.label_height.text = f"Höhe:\n{height}m"
 
     def text_field_person_height_on_text(self, text):
-        print(f"Text entered: {text}")
-
-    def update_labe_distance_value(self, distance):
-        self.ids.label_distance.text = f"Distanz:\n{distance}m"
-
-    def update_label_height_value(self, height):
-        self.ids.label_height.text = f"Höhe:\n{height}m"
-    
-    def text_field_person_height_on_text(self, text):
         """Set the person's height based on user input."""
         try:
             self.measurementsHandler.setPersonHeight(float(text))
@@ -122,6 +111,7 @@ class RootWidget(ScreenManager):
                 # Step 2: Calculate height using distance and new pitch angle
                 height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.pitch)
                 self.step = 2
+                self.root.export_height_data_as_json(height)
             else:
                 #Step 3: Reset values in UI
                 self.resetMeasurements()    
@@ -307,7 +297,6 @@ class Main(MDApp):
         elif platform == "android":
             self.request_app_permissions()
         self.root.orientationHandler.enable_listener()
-        self.root.export_height_data_as_json(1.75)
 
     def on_stop(self):
         self.root.orientationHandler.disable_listener()
