@@ -111,7 +111,7 @@ class RootWidget(ScreenManager):
                 # Step 2: Calculate height using distance and new pitch angle
                 height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.pitch)
                 self.step = 2
-                self.root.export_height_data_as_json(height)
+                self.export_height_data_as_json(height)
             else:
                 #Step 3: Reset values in UI
                 self.resetMeasurements()    
