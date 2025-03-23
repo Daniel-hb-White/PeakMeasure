@@ -26,6 +26,7 @@ class RootWidget(ScreenManager):
     def on_touch_down(self, touch):
         self.touch_start_x = touch.x
         print("Pressed screen at:", touch.x)
+        return super().on_touch_down(touch)
 
     def on_touch_up(self, touch):
         touch_end_x = touch.x
