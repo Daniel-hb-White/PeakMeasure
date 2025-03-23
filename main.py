@@ -26,6 +26,9 @@ else:
     documents_path = os.path.join(os.getcwd(), "height_data.json")
 
 class RootWidget(ScreenManager):
+    """
+    Root widget that manages the application's screens and handles user interactions.
+    """
     # Measurement values
     distanceRounded = NumericProperty(0)
     distance = NumericProperty(0)
@@ -35,6 +38,9 @@ class RootWidget(ScreenManager):
     measureTypeButton = StringProperty("Große Objekte")
 
     def __init__(self, **kwargs):
+        """
+        Initialize the RootWidget with default values and handlers for orientation and measurements.
+        """
         super().__init__(**kwargs)
         self.transition = SlideTransition()
         self.touch_start_x = 0
@@ -42,11 +48,23 @@ class RootWidget(ScreenManager):
         self.measurementsHandler = MeasurementHandler()
 
     def on_touch_down(self, touch):
+        """
+        Handle touch down events and store the starting x-coordinate of the touch.
+
+        :param touch: The touch event object containing touch details.
+        """
         self.touch_start_x = touch.x
         print("Pressed screen at:", touch.x)
         return super().on_touch_down(touch)
 
     def on_touch_up(self, touch):
+        """
+        Handle touch up events and determine if a swipe gesture occurred.
+        If the swipe is large enough, navigate to the appropriate screen.
+        if not then act as a normal button (start height calculation process).
+
+        :param touch: The touch event object containing touch details.
+        """
         touch_end_x = touch.x
         delta_x = touch_end_x - self.touch_start_x
 
@@ -62,6 +80,9 @@ class RootWidget(ScreenManager):
                 self.on_measure_button()
 
     def setup_camera(self):
+        """
+        Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
+        """
         # Create hidden camera widget used only for accessing the camera, not visible
         if check_permission(Permission.CAMERA):
             if not self.camera:
@@ -71,6 +92,12 @@ class RootWidget(ScreenManager):
                 print("Camera setup complete.")
 
     def update_image(self, dt):
+        """
+        Update the camera feed by rotating the image received from Kivy's 'Camera' widget,
+        then displaying it on the screen per 'Image' widget.
+
+        :param dt: The time interval since the last update.
+        """
         if self.camera and self.camera.texture:
             texture = self.camera.texture
             width, height = texture.size
@@ -86,18 +113,19 @@ class RootWidget(ScreenManager):
             self.ids.image_camera.texture = rotated_texture
 
     def update_labe_distance_value(self, distance):
+        """
+        Update the distance label with the given distance value.
+
+        :param distance: The distance value to display.
+        """
         self.ids.label_distance.text = f"Distanz:\n{distance}m"
 
     def update_label_height_value(self, height):
-        self.ids.label_height.text = f"Höhe:\n{height}m"
+        """
+        Update the height label with the given height value.
 
-    def text_field_person_height_on_text(self, text):
-        print(f"Text entered: {text}")
-
-    def update_labe_distance_value(self, distance):
-        self.ids.label_distance.text = f"Distanz:\n{distance}m"
-
-    def update_label_height_value(self, height):
+        :param height: The height value to display.
+        """
         self.ids.label_height.text = f"Höhe:\n{height}m"
     
     def text_field_person_height_on_text(self, text):
