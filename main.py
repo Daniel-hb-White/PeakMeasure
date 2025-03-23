@@ -9,18 +9,18 @@ from plyer import spatialorientation
 
 from kivymd.app import MDApp
 from kivy.app import App
-from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.utils import platform
-from kivy.uix.screenmanager import ScreenManager, SlideTransition
-from kivy.graphics.texture import Texture
 from kivy.clock import Clock
+from kivy.uix.screenmanager import ScreenManager, SlideTransition
+from kivy.uix.camera import Camera
+from kivy.graphics.texture import Texture
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 
 if platform == "android":
-    from android.permissions import request_permissions, Permission # type: ignore
+    from android.permissions import request_permissions, Permission, check_permission # type: ignore
     documents_path = "./height_data.json"
 else:
     documents_path = os.path.join(os.getcwd(), "height_data.json")
@@ -62,10 +62,13 @@ class RootWidget(ScreenManager):
                 self.on_measure_button()
 
     def setup_camera(self):
-        self.camera = self.ids.hidden_camera
-        if self.camera:
-            self.camera.play = True
-            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+        # Create hidden camera widget used only for accessing the camera, not visible
+        if check_permission(Permission.CAMERA):
+            if not self.camsaera:
+                self.camera = Camera(play=True, opacity=0)
+                self.add_widget(self.camera)
+                Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+                print("Camera setup complete.")
 
     def update_image(self, dt):
         if self.camera and self.camera.texture:
