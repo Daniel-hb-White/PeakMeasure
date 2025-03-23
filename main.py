@@ -19,7 +19,6 @@ from kivy.clock import Clock
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
-from kivy.uix.relativelayout import RelativeLayout
 
 if platform == "android":
     from android.permissions import request_permissions, Permission # type: ignore
