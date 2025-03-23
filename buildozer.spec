@@ -15,7 +15,7 @@ icon.filename = mokup_und_logo/PeakMeasureLogo.png
 orientation = portrait
 fullscreen = 0
 android.archs = arm64-v8a
-android.permissions = CAMERA, READ_INTERNAL_STORAGE, WRITE_INTERNAL_STORAGE 
+android.permissions = CAMERA 
 #p4a.branch = release-2022.12.20
 
 # iOS specific

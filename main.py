@@ -289,7 +289,7 @@ class Main(MDApp):
         return RootWidget()
     
     def request_app_permissions(self):
-        request_permissions([Permission.CAMERA, Permission.READ_INTERNAL_STORAGE, Permission.WRITE_INTERNAL_STORAGE], self.on_app_permissions_result)
+        request_permissions([Permission.CAMERA], self.on_app_permissions_result)
 
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
