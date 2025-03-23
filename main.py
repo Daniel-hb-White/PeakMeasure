@@ -1,16 +1,21 @@
 import numpy as np
 from PIL import Image
 from kivymd.app import MDApp
+import json
+import os
+from datetime import datetime
 from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.graphics.texture import Texture
-
+from kivy.app import App
 from kivy.clock import Clock
 
 if platform == "android":
-    from android.permissions import request_permissions, Permission  # type: ignore
-
+    from android.permissions import request_permissions, Permission, check_permission  # type: ignore
+    documents_path = os.path.join(App.get_running_app().user_data_dir, "height_data.json")
+else:
+    documents_path = os.path.join(os.getcwd(), "height_data.json")
 
 class RootWidget(ScreenManager):
     def __init__(self, **kwargs):
@@ -73,6 +78,27 @@ class RootWidget(ScreenManager):
     def text_field_person_height_on_text(self, text):
         print(f"Text entered: {text}")
 
+    def export_height_data_as_json(self, height=5.0):
+        data = {
+            "height": height,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        file_path = documents_path
+        
+        try:
+            with open(file_path, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+            print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
+            
+            # Überprüfen, ob die Datei erfolgreich gespeichert wurde
+            with open(file_path, "r") as json_file:
+                content = json.load(json_file)
+                print("Gespeicherte JSON-Daten:", content)
+                
+        except Exception as e:
+            print(f"Fehler beim Speichern der Höhe: {e}")
+
 
 class Main(MDApp):
 
@@ -82,16 +108,17 @@ class Main(MDApp):
         self.theme_cls.primary_palette = "White"
 
         return RootWidget()
-
+    
     def request_app_permissions(self):
         request_permissions([Permission.CAMERA], self.on_app_permissions_result)
 
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
-            print("Success: Camera permission granted.")
+            print("Success: Required permissions granted.")
             self.root.setup_camera()
         else:
-            print("Error: Camera permission not granted.")
+            print("Error: Required permissions not granted.")
+            self.show_permission_popup()
 
     def on_start(self):
         if platform not in ["android", "ios"]:
@@ -99,6 +126,8 @@ class Main(MDApp):
             self.root.setup_camera()
         elif platform == "android":
             self.request_app_permissions()
+
+        self.root.export_height_data_as_json(1.75)
 
 
 Main().run()
