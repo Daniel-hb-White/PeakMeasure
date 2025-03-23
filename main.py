@@ -21,7 +21,7 @@ from kivy.properties import StringProperty
 
 if platform == "android":
     from android.permissions import request_permissions, Permission # type: ignore
-    documents_path = os.path.join(App.get_running_app().user_data_dir, "height_data.json")
+    documents_path = "./height_data.json"
 else:
     documents_path = os.path.join(os.getcwd(), "height_data.json")
 
