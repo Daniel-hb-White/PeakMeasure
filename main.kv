@@ -1,15 +1,12 @@
 <RootWidget>:
     Screen:
         name: "screen_camera"
+        id: screen_camera
+
         MDFloatLayout:
             Image:  # Image displaying the transformed camera output
                 id: image_camera
                 fit_mode: "cover"
-
-            Camera:  # Hidden camera widget only for accessing the camera, not visible
-                id: hidden_camera
-                play: False
-                opacity: 0 
 
             MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"

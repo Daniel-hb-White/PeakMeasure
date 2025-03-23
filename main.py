@@ -9,21 +9,24 @@ from plyer import spatialorientation
 
 from kivymd.app import MDApp
 from kivy.app import App
-from kivy.lang import Builder
 from kivy.core.window import Window
 from kivy.utils import platform
+from kivy.clock import Clock, mainthread
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
+from kivy.uix.camera import Camera
 from kivy.graphics.texture import Texture
-from kivy.clock import Clock
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 
 if platform == "android":
-    from android.permissions import request_permissions, Permission # type: ignore
+    from android.permissions import request_permissions, Permission, check_permission # type: ignore
     documents_path = "./height_data.json"
 
 class RootWidget(ScreenManager):
+    """
+    Root widget that manages the application's screens and handles user interactions.
+    """
     # Measurement values
     distanceRounded = NumericProperty(0)
     distance = NumericProperty(0)
@@ -33,39 +36,36 @@ class RootWidget(ScreenManager):
     measureTypeButton = StringProperty("Große Objekte")
 
     def __init__(self, **kwargs):
+        """
+        Initialize the RootWidget with default values and handlers for orientation and measurements.
+        """
         super().__init__(**kwargs)
         self.transition = SlideTransition()
         self.touch_start_x = 0
         self.orientationHandler = OrientationHandler()
         self.measurementsHandler = MeasurementHandler()
 
-    def on_touch_down(self, touch):
-        self.touch_start_x = touch.x
-        print("Pressed screen at:", touch.x)
-        return super().on_touch_down(touch)
-
-    def on_touch_up(self, touch):
-        touch_end_x = touch.x
-        delta_x = touch_end_x - self.touch_start_x
-
-        if abs(delta_x) > 100:
-            if delta_x > 0:
-                self.transition.direction = "right"
-                self.current = "screen_settings"
-            else:
-                self.transition.direction = "left"
-                self.current = "screen_camera"
-        else:
-            if self.current == "screen_camera":
-                self.on_measure_button()
-
+    
+    @mainthread
     def setup_camera(self):
-        self.camera = self.ids.hidden_camera
-        if self.camera:
-            self.camera.play = True
+        """
+        Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
+        """
+        print("Setting up camera..")
+        # Create hidden camera widget used only for accessing the camera, not visible
+        if check_permission(Permission.CAMERA):
+            self.camera = Camera(play=True, opacity=0)
+            self.ids.screen_camera.add_widget(self.camera)
             Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+            print("Camera setup complete.")
 
     def update_image(self, dt):
+        """
+        Update the camera feed by rotating the image received from Kivy's 'Camera' widget,
+        then displaying it on the screen per 'Image' widget.
+
+        :param dt: The time interval since the last update.
+        """
         if self.camera and self.camera.texture:
             texture = self.camera.texture
             width, height = texture.size
@@ -80,10 +80,52 @@ class RootWidget(ScreenManager):
 
             self.ids.image_camera.texture = rotated_texture
 
+    def on_touch_down(self, touch):
+        """
+        Handle touch down events and store the starting x-coordinate of the touch.
+
+        :param touch: The touch event object containing touch details.
+        """
+        self.touch_start_x = touch.x
+        print("Pressed screen at:", touch.x)
+        return super().on_touch_down(touch)
+
+    def on_touch_up(self, touch):
+        """
+        Handle touch up events and determine if a swipe gesture occurred.
+        If the swipe is large enough, navigate to the appropriate screen.
+        if not then act as a normal button (start height calculation process).
+
+        :param touch: The touch event object containing touch details.
+        """
+        touch_end_x = touch.x
+        delta_x = touch_end_x - self.touch_start_x
+
+        if abs(delta_x) > 100:
+            if delta_x > 0:
+                self.transition.direction = "right"
+                self.current = "screen_settings"
+            else:
+                self.transition.direction = "left"
+                self.current = "screen_camera"
+        else:
+            if self.current == "screen_camera":
+                self.on_measure_button()
+
     def update_labe_distance_value(self, distance):
+        """
+        Update the distance label with the given distance value.
+
+        :param distance: The distance value to display.
+        """
         self.ids.label_distance.text = f"Distanz:\n{distance}m"
 
     def update_label_height_value(self, height):
+        """
+        Update the height label with the given height value.
+
+        :param height: The height value to display.
+        """
         self.ids.label_height.text = f"Höhe:\n{height}m"
 
     def text_field_person_height_on_text(self, text):
@@ -277,7 +319,15 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
-        return RootWidget()
+        self.root = RootWidget()
+
+        if platform not in ["android", "ios"]:
+            Window.size = (360, 640)
+            self.root.setup_camera()
+        elif platform == "android":
+            self.request_app_permissions()
+
+        return self.root
     
     def request_app_permissions(self):
         request_permissions([Permission.CAMERA], self.on_app_permissions_result)
@@ -288,14 +338,8 @@ class Main(MDApp):
             self.root.setup_camera()
         else:
             print("Error: Required permissions not granted.")
-            self.show_permission_popup()
 
     def on_start(self):
-        if platform not in ["android", "ios"]:
-            Window.size = (360, 640)
-            self.root.setup_camera()
-        elif platform == "android":
-            self.request_app_permissions()
         self.root.orientationHandler.enable_listener()
 
     def on_stop(self):
