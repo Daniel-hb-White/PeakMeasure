@@ -29,7 +29,7 @@ class RootWidget(RelativeLayout):
             pixels = np.frombuffer(texture.pixels, dtype=np.uint8).reshape(height, width, 4)
             pil_image = Image.fromarray(pixels, mode='RGBA')
 
-            transformed_image = pil_image.rotate(180, expand=True)
+            transformed_image = pil_image.rotate(90, expand=True)
 
             rotated_texture = Texture.create(size=(transformed_image.width, transformed_image.height), colorfmt='rgba')
             rotated_texture.blit_buffer(transformed_image.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
