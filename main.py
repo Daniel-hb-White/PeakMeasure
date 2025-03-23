@@ -79,38 +79,6 @@ class RootWidget(ScreenManager):
             if self.current == "screen_camera":
                 self.on_measure_button()
 
-    def setup_camera(self):
-        """
-        Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
-        """
-        # Create hidden camera widget used only for accessing the camera, not visible
-        if check_permission(Permission.CAMERA):
-            self.camera = Camera(play=True, opacity=0)
-            self.add_widget(self.camera)
-            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
-            print("Camera setup complete.")
-
-    def update_image(self, dt):
-        """
-        Update the camera feed by rotating the image received from Kivy's 'Camera' widget,
-        then displaying it on the screen per 'Image' widget.
-
-        :param dt: The time interval since the last update.
-        """
-        if self.camera and self.camera.texture:
-            texture = self.camera.texture
-            width, height = texture.size
-
-            pixels = np.frombuffer(texture.pixels, dtype=np.uint8).reshape(height, width, 4)
-            pil_image = Image.fromarray(pixels, mode='RGBA')
-
-            transformed_image = pil_image.rotate(90, expand=True)
-
-            rotated_texture = Texture.create(size=(transformed_image.width, transformed_image.height), colorfmt='rgba')
-            rotated_texture.blit_buffer(transformed_image.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
-
-            self.ids.image_camera.texture = rotated_texture
-
     def update_labe_distance_value(self, distance):
         """
         Update the distance label with the given distance value.
@@ -317,7 +285,15 @@ class Main(MDApp):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "White"
 
-        return RootWidget()
+        self.root = RootWidget()
+
+        if platform not in ["android", "ios"]:
+            Window.size = (360, 640)
+            self.setup_camera()
+        elif platform == "android":
+            self.request_app_permissions()
+
+        return self.root
     
     def request_app_permissions(self):
         request_permissions([Permission.CAMERA], self.on_app_permissions_result)
@@ -325,17 +301,43 @@ class Main(MDApp):
     def on_app_permissions_result(self, permissions, results):
         if Permission.CAMERA in permissions and results[permissions.index(Permission.CAMERA)]:
             print("Success: Required permissions granted.")
-            self.root.setup_camera()
+            self.setup_camera()
         else:
             print("Error: Required permissions not granted.")
-            self.show_permission_popup()
+
+    def setup_camera(self):
+        """
+        Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
+        """
+        # Create hidden camera widget used only for accessing the camera feed, not visible
+        if check_permission(Permission.CAMERA):
+            self.camera = Camera(play=True, opacity=0)
+            self.add_widget(self.camera)
+            Clock.schedule_interval(self.update_image, 1.0 / 30.0)
+            print("Camera setup complete.")
+
+    def update_image(self, dt):
+        """
+        Update the camera feed by rotating the image received from Kivy's 'Camera' widget,
+        then displaying it on the screen per 'Image' widget.
+
+        :param dt: The time interval since the last update.
+        """
+        if self.camera and self.camera.texture:
+            texture = self.camera.texture
+            width, height = texture.size
+
+            pixels = np.frombuffer(texture.pixels, dtype=np.uint8).reshape(height, width, 4)
+            pil_image = Image.fromarray(pixels, mode='RGBA')
+
+            transformed_image = pil_image.rotate(90, expand=True)
+
+            rotated_texture = Texture.create(size=(transformed_image.width, transformed_image.height), colorfmt='rgba')
+            rotated_texture.blit_buffer(transformed_image.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
+
+            self.root.ids.image_camera.texture = rotated_texture
 
     def on_start(self):
-        if platform not in ["android", "ios"]:
-            Window.size = (360, 640)
-            self.root.setup_camera()
-        elif platform == "android":
-            self.request_app_permissions()
         self.root.orientationHandler.enable_listener()
         self.root.export_height_data_as_json(1.75)
 
