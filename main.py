@@ -146,6 +146,27 @@ class RootWidget(ScreenManager):
         self.heightRounded = 0
         self.step = 0
 
+    def export_height_data_as_json(self, height):
+        data = {
+            "height": height,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        file_path = documents_path
+        
+        try:
+            with open(file_path, "w") as json_file:
+                json.dump(data, json_file, indent=4)
+            print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
+            
+            # Überprüfen, ob die Datei erfolgreich gespeichert wurde
+            with open(file_path, "r") as json_file:
+                content = json.load(json_file)
+                print("Gespeicherte JSON-Daten:", content)
+                
+        except Exception as e:
+            print(f"Fehler beim Speichern der Höhe: {e}")
+
 #---------------------------- OrientationHandler ---------------------------------
 class OrientationHandler:
     """
@@ -257,28 +278,6 @@ class MeasurementHandler:
 
 #----------------------------------------------------------------------------------
 
-    def export_height_data_as_json(self, height=5.0):
-        data = {
-            "height": height,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-        
-        file_path = documents_path
-        
-        try:
-            with open(file_path, "w") as json_file:
-                json.dump(data, json_file, indent=4)
-            print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
-            
-            # Überprüfen, ob die Datei erfolgreich gespeichert wurde
-            with open(file_path, "r") as json_file:
-                content = json.load(json_file)
-                print("Gespeicherte JSON-Daten:", content)
-                
-        except Exception as e:
-            print(f"Fehler beim Speichern der Höhe: {e}")
-
-
 class Main(MDApp):
 
     def build(self):
@@ -306,7 +305,7 @@ class Main(MDApp):
         elif platform == "android":
             self.request_app_permissions()
         self.root.orientationHandler.enable_listener()
-        self.root.export_height_data_as_json(1.75)
+        # self.root.export_height_data_as_json(1.75)
 
     def on_stop(self):
         self.root.orientationHandler.disable_listener()
