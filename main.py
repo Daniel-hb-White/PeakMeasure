@@ -41,8 +41,8 @@ class RootWidget(ScreenManager):
         super().__init__(**kwargs)
         self.transition = SlideTransition()
         self.touch_start_x = 0
-        self.__orientationHandler = OrientationHandler()
-        self.__measurementsHandler = MeasurementHandler()
+        self.orientationHandler = OrientationHandler()
+        self.measurementsHandler = MeasurementHandler()
 
     
     @mainthread
@@ -135,12 +135,12 @@ class RootWidget(ScreenManager):
         try:
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
-                self.distance, self.distanceRounded = self.__measurementsHandler.calculateDistance(self.__orientationHandler.getPitch())
+                self.distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.getPitch())
                 self.step = 1
 
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
-                height, self.heightRounded = self.__measurementsHandler.calculateHeight(self.distance, self.__orientationHandler.getPitch())
+                height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.getPitch())
                 self.step = 2
                 self.export_height_data_as_json(height)
             else:
@@ -157,7 +157,7 @@ class RootWidget(ScreenManager):
         and 'Kleine Objekte' (Small Objects), then reset measurement values.
         Author: Daniel Lacker
         """
-        self.measureTypeButton = self.__measurementsHandler.switchMeasurementType()
+        self.measureTypeButton = self.measurementsHandler.switchMeasurementType()
         self.resetMeasurements()
     
     def resetMeasurements(self):
@@ -216,21 +216,21 @@ class OrientationHandler:
         self.__azimuth = 0
         self.__roll = 0
 
-    def enable_listener(self):
+    def enableListener(self):
         """
         Enable the orientation sensor listener and start updating orientation values at a fixed interval.
         """
         spatialorientation.enable_listener()
-        Clock.schedule_interval(self.get_orientation, 1 / 20.)
+        Clock.schedule_interval(self.getOrientation, 1 / 20.)
 
-    def disable_listener(self):
+    def disableListener(self):
         """
         Disable the orientation sensor listener and stop updating orientation values.
         """
         spatialorientation.disable_listener()
-        Clock.unschedule(self.get_orientation)
+        Clock.unschedule(self.getOrientation)
 
-    def get_orientation(self, dt):
+    def getOrientation(self, dt):
         """
         Update the orientation properties (azimuth, pitch, roll) based on sensor data.
         Pitch is converted to a range between 1° and 89° to avoid extreme values.
@@ -368,13 +368,13 @@ class Main(MDApp):
         """
         Called when the app starts. Enables the orientation sensor listener.
         """
-        self.root.__orientationHandler.enable_listener()
+        self.root.orientationHandler.enableListener()
 
     def on_stop(self):
         """
         Called when the app stops. Disables the orientation sensor listener.
         """
-        self.root.__orientationHandler.disable_listener()
+        self.root.orientationHandler.disableListener()
 
 
 Main().run()
