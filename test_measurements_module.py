@@ -16,25 +16,25 @@ class TestMeasurementHandler(unittest.TestCase):
 
     def test_calculate_distance_45_degrees(self):
         self.handler.setPersonHeight(1.8)
-        distance, rounded = self.handler.calculateDistance(45)
+        distance, rounded = self.handler.calculateDistance(math.radians(45))
         expected = 1.8 / math.tan(math.radians(45))
         self.assertAlmostEqual(distance, expected, places=5)
         self.assertEqual(rounded, round(expected, 2))
 
     def test_calculate_distance_low_angle(self):
         self.handler.setPersonHeight(1.5)
-        distance, rounded = self.handler.calculateDistance(1)
+        distance, rounded = self.handler.calculateDistance(math.radians(1))
         self.assertGreater(distance, 85)
 
     def test_calculate_distance_high_angle(self):
         self.handler.setPersonHeight(1.5)
-        distance, rounded = self.handler.calculateDistance(89)
+        distance, rounded = self.handler.calculateDistance(math.radians(89))
         self.assertLess(distance, 1)
 
     def test_calculate_height_grosse_objekte(self):
         self.handler.setPersonHeight(1.8)
         self.handler.measureTypeButton = "Große Objekte"
-        height, rounded = self.handler.calculateHeight(1.8, 45)
+        height, rounded = self.handler.calculateHeight(1.8, math.radians(45))
         expected = 1.8 * math.tan(math.radians(45)) + 1.8
         self.assertAlmostEqual(height, expected, places=5)
         self.assertEqual(rounded, round(expected, 2))
@@ -42,7 +42,7 @@ class TestMeasurementHandler(unittest.TestCase):
     def test_calculate_height_kleine_objekte(self):
         self.handler.setPersonHeight(1.8)
         self.handler.measureTypeButton = "Kleine Objekte"
-        height, rounded = self.handler.calculateHeight(1.8, 45)
+        height, rounded = self.handler.calculateHeight(1.8, math.radians(45))
         expected = 1.8 - (1.8 * math.tan(math.radians(45)))
         self.assertAlmostEqual(height, expected, places=5)
         self.assertEqual(rounded, round(expected, 2))
@@ -69,15 +69,15 @@ class TestOrientationHandler(unittest.TestCase):
 
     def test_pitch_clamping(self):
         # Simulate extreme pitch angles manually
-        self.orientation.pitch = -10
-        if self.orientation.pitch < 1:
-            self.orientation.pitch = 1
-        self.assertEqual(self.orientation.pitch, 1)
+        self.orientation.pitch = math.radians(-10)
+        if self.orientation.pitch < math.radians(1):
+            self.orientation.pitch = math.radians(1)
+        self.assertEqual(self.orientation.pitch, math.radians(1))
 
-        self.orientation.pitch = 95
-        if self.orientation.pitch > 89:
-            self.orientation.pitch = 89
-        self.assertEqual(self.orientation.pitch, 89)
+        self.orientation.pitch = math.radians(95)
+        if self.orientation.pitch > math.radians(89):
+            self.orientation.pitch = math.radians(89)
+        self.assertEqual(self.orientation.pitch, math.radians(89))
 
 if __name__ == '__main__':
     unittest.main()
