@@ -48,13 +48,13 @@
     Screen:
         name: "screen_settings"
         MDFloatLayout:
-            MDAnchorLayout:
+            MDAnchorLayout:  # AnchorLayout for screen position
                 anchor_x: "center"
                 anchor_y: "top"
                 padding: dp(20), dp(40), dp(20), dp(40)
                 md_bg_color: "white"
 
-                MDBoxLayout:
+                MDBoxLayout:  # BoxLayout for the second page
                     orientation: "vertical"
                     md_bg_color: "white"
                     size_hint: None, None
@@ -68,19 +68,19 @@
                         size_hint_y: None
                         text: "1.5"
                         required: True
-                        on_text: root.text_field_person_height_on_text(self.text)
 
+                        on_text: root.text_field_person_height_on_text(self.text)
                         MDTextFieldHelperText:
                             text: "Gehaltene Höhe Ihres Gerätes in Metern"
                             mode: "persistent"
 
                     MDLabel:
-                        text: "[b]Bedienungsanleitung:[/b]\\n\\n"
+                        text: "[b]Bedienungsanleitung:[/b]\n\n"
                         markup: True
                         color: "black"    
 
                     MDLabel:
-                        text: "[b]1. Setze den niedrigsten Punkt:[/b] \\nZielen Sie mit dem Fadenkreuz auf die Basis des Objekts und tippen Sie auf den Bildschirm. \\n\\n[b]2. Setze den höchsten Punkt:[/b] \\nZielen Sie mit dem Fadenkreuz auf die Spitze des Objekts und tippen Sie erneut auf den Bildschirm. \\n\\n[b]3. Zurücksetzen:[/b] \\nTippen Sie ein weiteres Mal auf den Bildschirm, um die Messung zurückzusetzen."
+                        text: "[b]1. Setze den niedrigsten Punkt:[/b] \nZielen Sie mit dem Fadenkreuz auf die Basis des Objekts und tippen Sie auf den Bildschirm. \n\n[b]2. Setze den höchsten Punkt:[/b] \nZielen Sie mit dem Fadenkreuz auf die Spitze des Objekts und tippen Sie erneut auf den Bildschirm. \n\n[b]3. Zurücksetzen:[/b] \nTippen Sie ein weiteres Mal auf den Bildschirm, um die Messung zurückzusetzen."
                         color: "black"
                         markup: True
                         font_size: 10
@@ -94,6 +94,7 @@
                 height: dp(40)
                 pos_hint: {"center_x": .5, "y": .2}
 
+            # Label to show the input error
             MDLabel:
                 text: str(root.label)
                 theme_text_color: "Secondary"
@@ -102,21 +103,11 @@
                 height: dp(40)
                 pos_hint: {"center_x": .5, "y": .1}
 
-            MDAnchorLayout:
-                anchor_x: "center"
-                anchor_y: "bottom"
-                padding: dp(20)
-                MDBoxLayout:
-                    size_hint: None, None
-                    size: dp(220), dp(50)
-                    pos_hint: {"center_x": .5}
-                    md_bg_color: "white"
-                    padding: dp(10)
-                    radius: [12]
-                    on_touch_down: lambda *args: root.switchMeasurementType() if self.collide_point(*args[1].pos) else None
-
-                    MDLabel:
-                        text: str(root.measureTypeButton)
-                        halign: "center"
-                        theme_text_color: "Custom"
-                        text_color: "white"
+            # Button to switch the calculation mode
+            MDButton:
+                pos_hint: {"center_x": .5, "y": .0}
+                width: dp(100)
+                height: dp(100)
+                on_press: root.switchMeasurementType()
+                MDButtonText:
+                    text: str(root.measureTypeButton)
