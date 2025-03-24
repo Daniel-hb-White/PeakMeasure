@@ -41,8 +41,8 @@ class RootWidget(ScreenManager):
         super().__init__(**kwargs)
         self.transition = SlideTransition()
         self.touch_start_x = 0
-        self.orientationHandler = OrientationHandler()
-        self.measurementsHandler = MeasurementHandler()
+        self.__orientationHandler = OrientationHandler()
+        self.__measurementsHandler = MeasurementHandler()
 
     
     @mainthread
@@ -135,7 +135,7 @@ class RootWidget(ScreenManager):
     def text_field_person_height_on_text(self, text):
         """Set the person's height based on user input."""
         try:
-            self.measurementsHandler.setPersonHeight(float(text))
+            self.__measurementsHandler.setPersonHeight(float(text))
         except ValueError:
             self.label = "Fehler: Ungültige Eingabe."
     
@@ -150,12 +150,12 @@ class RootWidget(ScreenManager):
         try:
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
-                self.distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.pitch)
+                self.distance, self.distanceRounded = self.__measurementsHandler.calculateDistance(self.__orientationHandler.getPitch())
                 self.step = 1
 
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
-                height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.pitch)
+                height, self.heightRounded = self.__measurementsHandler.calculateHeight(self.distance, self.__orientationHandler.getPitch())
                 self.step = 2
                 self.export_height_data_as_json(height)
             else:
@@ -172,7 +172,7 @@ class RootWidget(ScreenManager):
         and 'Kleine Objekte' (Small Objects), then reset measurement values.
         Author: Daniel Lacker
         """
-        self.measureTypeButton = self.measurementsHandler.switchMeasurementType()
+        self.measureTypeButton = self.__measurementsHandler.switchMeasurementType()
         self.resetMeasurements()
     
     def resetMeasurements(self):
@@ -227,9 +227,9 @@ class OrientationHandler:
         """
         Initialize the orientation handler with default values for pitch, azimuth, and roll.
         """
-        self.pitch = 0
-        self.azimuth = 0
-        self.roll = 0
+        self.__pitch = 0
+        self.__azimuth = 0
+        self.__roll = 0
 
     def enable_listener(self):
         """
@@ -252,16 +252,24 @@ class OrientationHandler:
         """
         if spatialorientation.orientation != (None, None, None):
             azimuth, pitch, roll = spatialorientation.orientation
-            self.azimuth = azimuth * (180/math.pi)
-            self.pitch = 90 - (pitch * (180/math.pi) * -1)
+            self.__azimuth = azimuth * (180/math.pi)
+            self.__pitch = 90 - (pitch * (180/math.pi) * -1)
             # Clamp pitch to avoid extreme values
-            if self.pitch < 1:
-                self.pitch = 1
-            elif self.pitch > 89:
-                self.pitch = 89
+            if self.__pitch < 1:
+                self.__pitch = 1
+            elif self.__pitch > 89:
+                self.__pitch = 89
 
-            self.pitchRounded = round(self.pitch, 2)
-            self.roll = roll * (180/math.pi)
+            self.__roll = roll * (180/math.pi)
+
+    def getPitch(self):
+        return self.__pitch
+    
+    def getAzimuth(self):
+        return self.__azimuth
+    
+    def getRoll(self):
+        return self.__roll
 
 #----------------------------- MeasurementHandler ---------------------------------
 class MeasurementHandler:
@@ -273,8 +281,8 @@ class MeasurementHandler:
         Initialize the measurement handler with a default person height (1.5 m)
         and default measurement mode set to 'Große Objekte' (Tall Objects).
         """
-        self.personHeight = 1.5  # Default height in meters
-        self.measureTypeButton = "Große Objekte"
+        self.__personHeight = 1.5  # Default height in meters
+        self.__measureTypeButton = "Große Objekte"
 
     def setPersonHeight(self, height):
         """
@@ -282,7 +290,7 @@ class MeasurementHandler:
 
         :param height: Height of the person in meters
         """
-        self.personHeight = height    
+        self.__personHeight = height    
 
     def calculateDistance(self, pitch):
         """
@@ -291,7 +299,7 @@ class MeasurementHandler:
         :param pitch: Pitch angle in degrees
         :return: Tuple of (exact distance, rounded distance in meters)
         """
-        distance = abs(self.personHeight / math.tan(math.radians(pitch)))
+        distance = abs(self.__personHeight / math.tan(math.radians(pitch)))
         return distance, round(distance, 2)
 
     def calculateHeight(self, distance, pitch):
@@ -305,10 +313,10 @@ class MeasurementHandler:
         """
         height = abs(distance * math.tan(math.radians(pitch)))
                 
-        if self.measureTypeButton == "Große Objekte":
-            height = height + self.personHeight
+        if self.__measureTypeButton == "Große Objekte":
+            height = height + self.__personHeight
         else:
-            height = self.personHeight - height
+            height = self.__personHeight - height
 
         return height, round(height, 2)
 
@@ -319,12 +327,12 @@ class MeasurementHandler:
 
         :return: The updated measurement type as a string
         """
-        if self.measureTypeButton == "Große Objekte":
-            self.measureTypeButton = "Kleine Objekte"
+        if self.__measureTypeButton == "Große Objekte":
+            self.__measureTypeButton = "Kleine Objekte"
         else:
-            self.measureTypeButton = "Große Objekte"
+            self.__measureTypeButton = "Große Objekte"
 
-        return self.measureTypeButton
+        return self.__measureTypeButton
 
 #----------------------------------------------------------------------------------
 
@@ -375,13 +383,13 @@ class Main(MDApp):
         """
         Called when the app starts. Enables the orientation sensor listener.
         """
-        self.root.orientationHandler.enable_listener()
+        self.root.__orientationHandler.enable_listener()
 
     def on_stop(self):
         """
         Called when the app stops. Disables the orientation sensor listener.
         """
-        self.root.orientationHandler.disable_listener()
+        self.root.__orientationHandler.disable_listener()
 
 
 Main().run()
