@@ -116,26 +116,11 @@ class RootWidget(ScreenManager):
             if self.current == "screen_camera":
                 self.on_measure_button()
 
-    def update_labe_distance_value(self, distance):
-        """
-        Update the distance label with the given distance value.
-
-        :param distance: The distance value to display.
-        """
-        self.ids.label_distance.text = f"Distanz:\n{distance}m"
-
-    def update_label_height_value(self, height):
-        """
-        Update the height label with the given height value.
-
-        :param height: The height value to display.
-        """
-        self.ids.label_height.text = f"Höhe:\n{height}m"
-
     def text_field_person_height_on_text(self, text):
         """Set the person's height based on user input."""
         try:
             self.__measurementsHandler.setPersonHeight(float(text))
+            self.label = ""
         except ValueError:
             self.label = "Fehler: Ungültige Eingabe."
     
