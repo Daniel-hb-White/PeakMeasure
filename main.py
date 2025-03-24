@@ -1,10 +1,8 @@
-import math
 import json
 import numpy as np
 from PIL import Image
 from kivymd.app import MDApp
 from datetime import datetime
-from plyer import spatialorientation
 
 from kivymd.app import MDApp
 from kivy.app import App
@@ -17,6 +15,9 @@ from kivy.graphics.texture import Texture
 from kivy.properties import NumericProperty
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
+
+from MeasurementHandler import MeasurementHandler
+from OrientationHandler import OrientationHandler
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission # type: ignore
@@ -202,124 +203,6 @@ class RootWidget(ScreenManager):
 
         except Exception as e:
             print(f"Fehler beim Speichern der Höhe: {e}")
-
-#---------------------------- OrientationHandler ---------------------------------
-class OrientationHandler:
-    """
-    Author: Daniel Lacker
-    """
-    def __init__(self):
-        """
-        Initialize the orientation handler with default values for pitch, azimuth, and roll.
-        """
-        self.__pitch = 0
-        self.__azimuth = 0
-        self.__roll = 0
-
-    def enableListener(self):
-        """
-        Enable the orientation sensor listener and start updating orientation values at a fixed interval.
-        """
-        spatialorientation.enable_listener()
-        Clock.schedule_interval(self.getOrientation, 1 / 20.)
-
-    def disableListener(self):
-        """
-        Disable the orientation sensor listener and stop updating orientation values.
-        """
-        spatialorientation.disable_listener()
-        Clock.unschedule(self.getOrientation)
-
-    def getOrientation(self, dt):
-        """
-        Update the orientation properties (azimuth, pitch, roll) based on sensor data.
-        Pitch is converted to a range between 1° and 89° to avoid extreme values.
-        """
-        if spatialorientation.orientation != (None, None, None):
-            azimuth, pitch, roll = spatialorientation.orientation
-            self.__azimuth = azimuth * (180/math.pi)
-            self.__pitch = 90 - (pitch * (180/math.pi) * -1)
-            # Clamp pitch to avoid extreme values
-            if self.__pitch < 1:
-                self.__pitch = 1
-            elif self.__pitch > 89:
-                self.__pitch = 89
-
-            self.__roll = roll * (180/math.pi)
-
-    def getPitch(self):
-        return self.__pitch
-    
-    def getAzimuth(self):
-        return self.__azimuth
-    
-    def getRoll(self):
-        return self.__roll
-
-#----------------------------- MeasurementHandler ---------------------------------
-class MeasurementHandler:
-    """
-    Author: Daniel
-    """
-    def __init__(self):
-        """
-        Initialize the measurement handler with a default person height (1.5 m)
-        and default measurement mode set to 'Große Objekte' (Tall Objects).
-        """
-        self.__personHeight = 1.5  # Default height in meters
-        self.__measureTypeButton = "Große Objekte"
-
-    def setPersonHeight(self, height):
-        """
-        Set the height of the person used as a reference in calculations.
-
-        :param height: Height of the person in meters
-        """
-        self.__personHeight = height    
-
-    def calculateDistance(self, pitch):
-        """
-        Calculate horizontal distance based on the pitch angle.
-
-        :param pitch: Pitch angle in degrees
-        :return: Tuple of (exact distance, rounded distance in meters)
-        """
-        distance = abs(self.__personHeight / math.tan(math.radians(pitch)))
-        return distance, round(distance, 2)
-
-    def calculateHeight(self, distance, pitch):
-        """
-        Calculate vertical height based on the horizontal distance and pitch angle.
-        The formula adjusts based on the selected measurement type.
-
-        :param distance: Horizontal distance in meters
-        :param pitch: Pitch angle in degrees
-        :return: Tuple of (exact height, rounded height in meters)
-        """
-        height = abs(distance * math.tan(math.radians(pitch)))
-                
-        if self.__measureTypeButton == "Große Objekte":
-            height = height + self.__personHeight
-        else:
-            height = self.__personHeight - height
-
-        return height, round(height, 2)
-
-    def switchMeasurementType(self):
-        """
-        Toggle between 'Große Objekte' (Tall Objects) and 'Kleine Objekte' (Small Objects)
-        measurement modes.
-
-        :return: The updated measurement type as a string
-        """
-        if self.__measureTypeButton == "Große Objekte":
-            self.__measureTypeButton = "Kleine Objekte"
-        else:
-            self.__measureTypeButton = "Große Objekte"
-
-        return self.__measureTypeButton
-
-#----------------------------------------------------------------------------------
 
 class Main(MDApp):
     """
