@@ -1,19 +1,15 @@
 import json
 import numpy as np
 from PIL import Image
-from kivymd.app import MDApp
 from datetime import datetime
 
 from kivymd.app import MDApp
-from kivy.app import App
-from kivy.core.window import Window
 from kivy.utils import platform
 from kivy.clock import Clock, mainthread
 from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.uix.camera import Camera
 from kivy.graphics.texture import Texture
 from kivy.properties import NumericProperty
-from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 
 from MeasurementHandler import MeasurementHandler
@@ -21,7 +17,8 @@ from OrientationHandler import OrientationHandler
 
 if platform == "android":
     from android.permissions import request_permissions, Permission, check_permission # type: ignore
-    documents_path = "./height_data.json"
+
+documents_path = "./height_data.json"
 
 class RootWidget(ScreenManager):
     """
@@ -211,7 +208,7 @@ class Main(MDApp):
 
     def build(self):
         """
-        Build the application UI and initialize platform-specific settings.
+        Build the application UI and start requesting app permissions.
         """
         self.icon = './mokup_und_logo/PeakMeasureLogo.png'
         self.theme_cls.theme_style = "Light"
@@ -219,12 +216,7 @@ class Main(MDApp):
 
         self.root = RootWidget()
 
-        # Handle platform-specific configurations
-        if platform not in ["android", "ios"]:
-            Window.size = (360, 640)
-            self.root.setup_camera()
-        elif platform == "android":
-            self.request_app_permissions()
+        self.request_app_permissions()
 
         return self.root
     
@@ -232,7 +224,8 @@ class Main(MDApp):
         """
         Request necessary permissions for the app to function on Android.
         """
-        request_permissions([Permission.CAMERA], self.on_app_permissions_result)
+        if platform == "android":
+            request_permissions([Permission.CAMERA], self.on_app_permissions_result)
 
     def on_app_permissions_result(self, permissions, results):
         """
