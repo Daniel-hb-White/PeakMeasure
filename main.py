@@ -236,13 +236,16 @@ class OrientationHandler:
         Pitch is converted to a range between 1° and 89° to avoid extreme values.
         """
         if spatialorientation.orientation != (None, None, None):
-            self.__azimuth, pitch, self.__roll = spatialorientation.orientation
-            self.__pitch = 90 - (pitch * -1)
+            azimuth, pitch, roll = spatialorientation.orientation
+            self.__azimuth = azimuth * (180/math.pi)
+            self.__pitch = 90 - (pitch * (180/math.pi) * -1)
             # Clamp pitch to avoid extreme values
-            if self.__pitch < math.radians(1):
-                self.__pitch = math.radians(1)
-            elif self.__pitch > math.radians(89):
-                self.__pitch = math.radians(89)
+            if self.__pitch < 1:
+                self.__pitch = 1
+            elif self.__pitch > 89:
+                self.__pitch = 89
+
+            self.__roll = roll * (180/math.pi)
 
     def getPitch(self):
         return self.__pitch
@@ -281,7 +284,7 @@ class MeasurementHandler:
         :param pitch: Pitch angle in degrees
         :return: Tuple of (exact distance, rounded distance in meters)
         """
-        distance = abs(self.__personHeight / math.tan(pitch))
+        distance = abs(self.__personHeight / math.tan(math.radians(pitch)))
         return distance, round(distance, 2)
 
     def calculateHeight(self, distance, pitch):
@@ -293,7 +296,7 @@ class MeasurementHandler:
         :param pitch: Pitch angle in degrees
         :return: Tuple of (exact height, rounded height in meters)
         """
-        height = abs(distance * math.tan(pitch))
+        height = abs(distance * math.tan(math.radians(pitch)))
                 
         if self.__measureTypeButton == "Große Objekte":
             height = height + self.__personHeight
