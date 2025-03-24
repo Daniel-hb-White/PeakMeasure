@@ -119,7 +119,7 @@ class RootWidget(ScreenManager):
     def text_field_person_height_on_text(self, text):
         """Set the person's height based on user input."""
         try:
-            self.__measurementsHandler.setPersonHeight(float(text))
+            self.measurementsHandler.setPersonHeight(float(text))
             self.label = ""
         except ValueError:
             self.label = "Fehler: Ungültige Eingabe."
