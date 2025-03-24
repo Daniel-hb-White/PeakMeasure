@@ -47,6 +47,8 @@ class RootWidget(ScreenManager):
     def setup_camera(self):
         """
         Set up the camera widget programmatically because of complications with android permissions & Kivy's camera widget.
+        
+        Author: Viktor Gauerhof
         """
         print("Setting up camera..")
         if check_permission(Permission.CAMERA):
@@ -63,6 +65,8 @@ class RootWidget(ScreenManager):
         then displaying it on the screen by updating the 'Image' widget.
 
         :param dt: The time interval since the last update.
+
+        Author: Viktor Gauerhof
         """
         if self.camera and self.camera.texture:
             texture = self.camera.texture
@@ -87,6 +91,8 @@ class RootWidget(ScreenManager):
         Handle touch down events and store the starting x-coordinate of the touch.
 
         :param touch: The touch event object containing touch details.
+
+        Author: Viktor Gauerhof
         """
         self.touch_start_x = touch.x
         print("Pressed screen at:", touch.x)
@@ -99,6 +105,8 @@ class RootWidget(ScreenManager):
         if not then act as a normal button (start process of height calculation).
 
         :param touch: The touch event object containing touch details.
+
+        Author: Viktor Gauerhof
         """
         touch_end_x = touch.x
         delta_x = touch_end_x - self.touch_start_x
@@ -115,7 +123,11 @@ class RootWidget(ScreenManager):
                 self.on_measure_button()
 
     def text_field_person_height_on_text(self, text):
-        """Set the person's height based on user input."""
+        """
+        Set the person's height based on user input.
+        
+        Author: Viktor Gauerhof
+        """
         try:
             self.measurementsHandler.setPersonHeight(float(text))
             self.label = ""
@@ -172,6 +184,7 @@ class RootWidget(ScreenManager):
         Export the calculated height data as a JSON file.
 
         :param height: The height value to save.
+        Author: Daniel Weiße
         """
         new_entry = {
             "height": height,
@@ -204,6 +217,8 @@ class RootWidget(ScreenManager):
 class Main(MDApp):
     """
     Main application class that initializes and runs the KivyMD app.
+
+    Author: Viktor Gauerhof
     """
 
     def build(self):
