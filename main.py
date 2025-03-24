@@ -41,8 +41,8 @@ class RootWidget(ScreenManager):
         super().__init__(**kwargs)
         self.transition = SlideTransition()
         self.touch_start_x = 0
-        self.__orientationHandler = OrientationHandler()
-        self.__measurementsHandler = MeasurementHandler()
+        self.orientationHandler = OrientationHandler()
+        self.measurementsHandler = MeasurementHandler()
 
     
     @mainthread
@@ -135,7 +135,7 @@ class RootWidget(ScreenManager):
     def text_field_person_height_on_text(self, text):
         """Set the person's height based on user input."""
         try:
-            self.__measurementsHandler.setPersonHeight(float(text))
+            self.measurementsHandler.setPersonHeight(float(text))
         except ValueError:
             self.label = "Fehler: Ungültige Eingabe."
     
@@ -150,12 +150,12 @@ class RootWidget(ScreenManager):
         try:
             if self.step == 0:
                 # Step 1: Calculate distance using the pitch angle
-                self.distance, self.distanceRounded = self.__measurementsHandler.calculateDistance(self.__orientationHandler.getPitch())
+                self.distance, self.distanceRounded = self.measurementsHandler.calculateDistance(self.orientationHandler.getPitch())
                 self.step = 1
 
             elif self.step == 1:
                 # Step 2: Calculate height using distance and new pitch angle
-                height, self.heightRounded = self.__measurementsHandler.calculateHeight(self.distance, self.__orientationHandler.getPitch())
+                height, self.heightRounded = self.measurementsHandler.calculateHeight(self.distance, self.orientationHandler.getPitch())
                 self.step = 2
                 self.export_height_data_as_json(height)
             else:
@@ -172,7 +172,7 @@ class RootWidget(ScreenManager):
         and 'Kleine Objekte' (Small Objects), then reset measurement values.
         Author: Daniel Lacker
         """
-        self.measureTypeButton = self.__measurementsHandler.switchMeasurementType()
+        self.measureTypeButton = self.measurementsHandler.switchMeasurementType()
         self.resetMeasurements()
     
     def resetMeasurements(self):
@@ -383,13 +383,13 @@ class Main(MDApp):
         """
         Called when the app starts. Enables the orientation sensor listener.
         """
-        self.root.__orientationHandler.enableListener()
+        self.root.orientationHandler.enableListener()
 
     def on_stop(self):
         """
         Called when the app stops. Disables the orientation sensor listener.
         """
-        self.root.__orientationHandler.disableListener()
+        self.root.orientationHandler.disableListener()
 
 
 Main().run()
