@@ -231,21 +231,21 @@ class OrientationHandler:
         self.__azimuth = 0
         self.__roll = 0
 
-    def enable_listener(self):
+    def enableListener(self):
         """
         Enable the orientation sensor listener and start updating orientation values at a fixed interval.
         """
         spatialorientation.enable_listener()
-        Clock.schedule_interval(self.get_orientation, 1 / 20.)
+        Clock.schedule_interval(self.getOrientation, 1 / 20.)
 
-    def disable_listener(self):
+    def disableListener(self):
         """
         Disable the orientation sensor listener and stop updating orientation values.
         """
         spatialorientation.disable_listener()
-        Clock.unschedule(self.get_orientation)
+        Clock.unschedule(self.getOrientation)
 
-    def get_orientation(self, dt):
+    def getOrientation(self, dt):
         """
         Update the orientation properties (azimuth, pitch, roll) based on sensor data.
         Pitch is converted to a range between 1° and 89° to avoid extreme values.
@@ -383,13 +383,13 @@ class Main(MDApp):
         """
         Called when the app starts. Enables the orientation sensor listener.
         """
-        self.root.__orientationHandler.enable_listener()
+        self.root.__orientationHandler.enableListener()
 
     def on_stop(self):
         """
         Called when the app stops. Disables the orientation sensor listener.
         """
-        self.root.__orientationHandler.disable_listener()
+        self.root.__orientationHandler.disableListener()
 
 
 Main().run()
