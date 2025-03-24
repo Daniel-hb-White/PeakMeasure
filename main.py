@@ -190,20 +190,31 @@ class RootWidget(ScreenManager):
 
         :param height: The height value to save.
         """
-        data = {
+        new_entry = {
             "height": height,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         file_path = documents_path
-        
+
         try:
+            # Bestehende Daten laden, falls möglich
+            try:
+                with open(file_path, "r") as json_file:
+                    data = json.load(json_file)
+                    if not isinstance(data, list):
+                        data = [data]
+            except (FileNotFoundError, json.JSONDecodeError):
+                data = []
+
+            data.append(new_entry)
+
             with open(file_path, "w") as json_file:
                 json.dump(data, json_file, indent=4)
-            print(f"Höhe erfolgreich als JSON gespeichert: {file_path}")
-            # Verify that the file was saved successfully
-            with open(file_path, "r") as json_file:
-                content = json.load(json_file)
-                print("Gespeicherte JSON-Daten:", content)
+            print(f"Höhenwert erfolgreich als JSON gespeichert: {file_path}")
+
+            # Debug-Ausgabe
+            print("Aktueller JSON-Inhalt:", data)
+
         except Exception as e:
             print(f"Fehler beim Speichern der Höhe: {e}")
 
